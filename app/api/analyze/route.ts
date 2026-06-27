@@ -57,7 +57,7 @@ export async function POST(req: Request) {
 const cleanedContent = cleanContent(
   cleanWebsite(content)
 );
-const shortContent = cleanedContent.slice(0, 3000);
+const shortContent = cleanedContent.slice(0, 15000);
     // Analyze
     const analysis = await analyzeBusiness(shortContent);
 
@@ -76,6 +76,11 @@ const shortContent = cleanedContent.slice(0, 3000);
     console.log("Chunks:");
     console.log(chunks.length);
     console.log(chunks);
+    chunks.forEach((chunk, index) => {
+  console.log(
+    `Chunk ${index + 1}: ${chunk.length} chars`
+  );
+});        
 
     // Parse analysis JSON
     const parsedAnalysis = parseAnalysis(analysis);

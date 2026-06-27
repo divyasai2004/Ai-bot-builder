@@ -1,31 +1,61 @@
-const priorityKeywords = [
+const HIGH_PRIORITY = [
   "iphone",
-  "mac",
   "ipad",
-  "watch",
+  "macbook",
+  "mac",
   "airpods",
+  "watch",
   "vision",
-  "store",
+  "services",
   "support",
-  "developer",
+];
+
+const LOW_PRIORITY = [
+  "privacy",
+  "legal",
+  "cookies",
+  "cookie",
+  "terms",
+  "newsroom",
+  "career",
+  "jobs",
+  "retail",
+  "government",
+  "shop/goto",
+  "session",
+  "signin",
+  "login",
+  "account",
+  "search",
 ];
 
 export function rankLinks(links: string[]) {
   return [...new Set(links)]
     .map((link) => {
+      const url = link.toLowerCase();
+
       let score = 0;
 
-      priorityKeywords.forEach((keyword) => {
-        if (link.toLowerCase().includes(keyword)) {
-          score += 10;
-        }
+      // Reward useful pages
+      HIGH_PRIORITY.forEach((keyword) => {
+        if (url.includes(keyword)) score += 20;
       });
 
-      if (link.includes("/shop/goto")) score -= 20;
-      if (link.includes("privacy")) score -= 20;
-      if (link.includes("legal")) score -= 20;
-      if (link.includes("newsroom")) score -= 10;
-      if (link.includes("#")) score -= 5;
+      // Penalize useless pages
+      LOW_PRIORITY.forEach((keyword) => {
+        if (url.includes(keyword)) score -= 50;
+      });
+
+      // Homepage gets slight priority
+      if (
+        url.split("/").filter(Boolean).length <= 3
+      ) {
+        score += 5;
+      }
+
+      // Penalize anchors & query params
+      if (url.includes("#")) score -= 10;
+      if (url.includes("?")) score -= 5;
 
       return { link, score };
     })

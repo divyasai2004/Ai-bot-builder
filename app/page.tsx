@@ -20,8 +20,13 @@ export default function Home() {
     },
   ]);
   const [products, setProducts] = useState<string[]>([]);
-  const [websiteId, setWebsiteId] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+const [websiteId, setWebsiteId] = useState("");
+
+const [chatHistory, setChatHistory] = useState<
+  { role: string; content: string }[]
+>([]);
+
+const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   async function analyzeWebsite() {
     try {
@@ -51,6 +56,7 @@ export default function Home() {
         setWebsiteContent(data.websiteContent);
         setProducts(data.products || []);
         setWebsiteId(data.websiteId);
+        setChatHistory([]);
         setMessages([
           {
             sender: "bot",
@@ -85,6 +91,9 @@ async function handleSend() {
 
   setIsTyping(true);
 
+  // Keep history before current question
+  const history = [...chatHistory];
+
   try {
     const res = await fetch("/api/chat", {
       method: "POST",
@@ -92,10 +101,10 @@ async function handleSend() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-  question,
-  websiteId,
-  products,
-}),
+        question,
+        websiteId,
+        history,
+      }),
     });
 
     const data = await res.json();
@@ -105,6 +114,19 @@ async function handleSend() {
       {
         sender: "bot",
         text: data.answer,
+      },
+    ]);
+
+    // Save conversation
+    setChatHistory((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content: question,
+      },
+      {
+        role: "assistant",
+        content: data.answer,
       },
     ]);
   } catch (error) {
