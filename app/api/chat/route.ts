@@ -96,19 +96,37 @@ Answer:
     console.log(prompt);
 
     const response = await ollama.chat({
-      model: "qwen2.5:1.5b",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    });
+  model: "qwen2.5:1.5b",
+  stream: true,
+  messages: [
+    {
+      role: "user",
+      content: prompt,
+    },
+  ],
+});
 
-    return NextResponse.json({
-      success: true,
-      answer: response.message.content,
-    });
+const encoder = new TextEncoder();
+
+const stream = new ReadableStream({
+  async start(controller) {
+    for await (const chunk of response) {
+      controller.enqueue(
+        encoder.encode(chunk.message?.content || "")
+      );
+    }
+
+    controller.close();
+  },
+});
+
+return new Response(stream, {
+  headers: {
+    "Content-Type": "text/plain; charset=utf-8",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+  },
+});
   } catch (error) {
     console.error(error);
 

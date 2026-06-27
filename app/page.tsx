@@ -87,11 +87,14 @@ async function handleSend() {
       sender: "user",
       text: question,
     },
+    {
+      sender: "bot",
+      text: "",
+    },
   ]);
 
   setIsTyping(true);
 
-  // Keep history before current question
   const history = [...chatHistory];
 
   try {
@@ -107,17 +110,32 @@ async function handleSend() {
       }),
     });
 
-    const data = await res.json();
+    if (!res.body) {
+      throw new Error("No response body");
+    }
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        sender: "bot",
-        text: data.answer,
-      },
-    ]);
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
 
-    // Save conversation
+    let answer = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+
+      if (done) break;
+
+      answer += decoder.decode(value);
+
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1] = {
+          sender: "bot",
+          text: answer,
+        };
+        return updated;
+      });
+    }
+
     setChatHistory((prev) => [
       ...prev,
       {
@@ -126,7 +144,7 @@ async function handleSend() {
       },
       {
         role: "assistant",
-        content: data.answer,
+        content: answer,
       },
     ]);
   } catch (error) {
