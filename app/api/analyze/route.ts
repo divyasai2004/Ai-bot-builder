@@ -10,13 +10,30 @@ import { getWebsite, saveWebsite } from "../../../lib/websiteService";
 import { saveChunks } from "../../../lib/vectorStore";
 import { cleanWebsite } from "../../../lib/cleanWebsite";
 import { cleanContent } from "../../../lib/contentCleaner";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 export async function POST(req: Request) {
   try {
+    const supabase = await createSupabaseServerClient();
+
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+if (!user) {
+  return NextResponse.json({
+    success: false,
+    error: "Please login first.",
+  });
+}
     const body = await req.json();
+    
 
     // Check if website already exists
-    const existingWebsite = await getWebsite(body.url);
+    const existingWebsite = await getWebsite(
+  body.url,
+  user.id
+);
 
     if (existingWebsite) {
       console.log("Website already analyzed.");
@@ -24,6 +41,8 @@ export async function POST(req: Request) {
       const cachedBotConfig = generateBotConfig(
         JSON.stringify(existingWebsite.analysis_json)
       );
+
+      
 
       const cachedWidgetCode =
         generateWidgetCode(cachedBotConfig);
@@ -87,17 +106,22 @@ const shortContent = cleanedContent.slice(0, 15000);
 
     // Save to Supabase
     const website = await saveWebsite({
+      user_id: user.id,
   website_url: body.url,
   industry: parsedAnalysis.industry || "",
   business_type: parsedAnalysis.businessType || "",
   bot_name: botConfig.botName,
+  welcome_message: botConfig.welcomeMessage,
+  theme: botConfig.theme,
+  suggested_questions: botConfig.suggestedQuestions,
   website_content: shortContent,
   analysis_json: parsedAnalysis,
   products,
 });
 await saveChunks(
   website.id,
-  chunks
+  chunks,
+  "__website__"
 );
 
     return NextResponse.json({
@@ -119,12 +143,12 @@ await saveChunks(
 
   cached: false,
 });
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+  console.error("ANALYZE ERROR:", error);
 
-    return NextResponse.json({
-      success: false,
-      error: "Analysis failed",
-    });
-  }
+  return NextResponse.json({
+    success: false,
+    error: error?.message || "Analysis failed",
+  });
+}
 }

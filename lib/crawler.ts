@@ -35,9 +35,7 @@ export async function crawlWebsite(url: string) {
       timeout: 15000,
     });
 
-    await page.waitForSelector("body", {
-      timeout: 5000,
-    });
+    
 
     // Give React/Next.js pages time to render
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -57,7 +55,7 @@ export async function crawlWebsite(url: string) {
 
     console.log("Internal links found:", links.length);
 
-    const pagesToVisit = [...new Set(rankLinks(links))].slice(0, 8);
+    const pagesToVisit = [...new Set(rankLinks(links))].slice(0, 4);
 
     console.log("Pages selected:");
 
@@ -68,82 +66,70 @@ pagesToVisit.forEach((page, i) => {
     // -------------------------
     // CRAWL PAGES
     // -------------------------
-    const pageTexts = await Promise.all(
-      pagesToVisit.map(async (link) => {
-        const newPage = await browser.newPage();
+    const pageTexts: string[] = [];
 
-        try {
-          // Speed up crawling
-          await newPage.setRequestInterception(true);
+for (const link of pagesToVisit) {
+  const newPage = await browser.newPage();
 
-          newPage.on("request", (request) => {
-            const type = request.resourceType();
+  try {
+    await newPage.setRequestInterception(true);
 
-            if (
-              type === "image" ||
-              type === "font" ||
-              type === "media" ||
-              type === "stylesheet"
-            ) {
-              request.abort();
-            } else {
-              request.continue();
-            }
-          });
+    newPage.on("request", (request) => {
+      const type = request.resourceType();
 
-          console.log("Crawling:", link);
+      if (
+        type === "image" ||
+        type === "font" ||
+        type === "media" ||
+        type === "stylesheet"
+      ) {
+        request.abort();
+      } else {
+        request.continue();
+      }
+    });
 
-          await newPage.goto(link, {
-            waitUntil: "domcontentloaded",
-            timeout: 15000,
-          });
+    console.log("Crawling:", link);
 
-          await newPage.waitForSelector("body", {
-            timeout: 5000,
-          });
+    await newPage.goto(link, {
+      waitUntil: "domcontentloaded",
+      timeout: 20000,
+    });
 
-          // Let React render
-          await new Promise((resolve) =>
-            setTimeout(resolve, 1500)
-          );
-
-          const text = await newPage.evaluate(() => {
-            const selectors = [
-              "main",
-              "article",
-              "section",
-              "[role='main']",
-            ];
-
-            let pageText = "";
-
-            selectors.forEach((selector) => {
-              document.querySelectorAll(selector).forEach((el) => {
-                pageText += " " + (el.textContent || "");
-              });
-            });
-
-            // Fallback
-            if (pageText.trim().length < 300) {
-              pageText = document.body.innerText;
-            }
-
-            return pageText;
-          });
-
-          await newPage.close();
-
-          return text;
-        } catch (error) {
-          console.log("Skipped:", link);
-          console.error(error);
-
-          await newPage.close();
-
-          return "";
-        }
-      })
+    await new Promise((resolve) =>
+      setTimeout(resolve, 1000)
     );
+
+    const text = await newPage.evaluate(() => {
+      const selectors = [
+        "main",
+        "article",
+        "section",
+        "[role='main']",
+      ];
+
+      let pageText = "";
+
+      selectors.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
+          pageText += " " + (el.textContent || "");
+        });
+      });
+
+      if (pageText.trim().length < 300) {
+        pageText = document.body.innerText;
+      }
+
+      return pageText;
+    });
+
+    pageTexts.push(text);
+  } catch (err) {
+    console.log("Skipped:", link);
+  } finally {
+    await newPage.close();
+  }
+}
 
     combinedText += "\n\n" + pageTexts.join("\n\n");
 

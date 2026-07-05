@@ -1,36 +1,35 @@
 export function chunkText(
   text: string,
-  chunkSize = 800
+  chunkSize = 800,
+  overlap = 150
 ) {
   const chunks: string[] = [];
 
-  // Split into paragraphs first
-  const paragraphs = text
-    .split(/\n+/)
-    .map((p) => p.trim())
-    .filter(Boolean);
+  // Normalize whitespace
+  text = text.replace(/\s+/g, " ").trim();
 
-  let currentChunk = "";
+  let start = 0;
 
-  for (const paragraph of paragraphs) {
-    // If adding this paragraph exceeds chunk size,
-    // save current chunk first.
-    if (
-      currentChunk.length + paragraph.length >
-      chunkSize
-    ) {
-      if (currentChunk.trim()) {
-        chunks.push(currentChunk.trim());
-      }
+  while (start < text.length) {
+    let end = start + chunkSize;
 
-      currentChunk = paragraph;
-    } else {
-      currentChunk += "\n\n" + paragraph;
+    if (end >= text.length) {
+      chunks.push(text.slice(start).trim());
+      break;
     }
-  }
 
-  if (currentChunk.trim()) {
-    chunks.push(currentChunk.trim());
+    // Try to end at sentence
+    const sentenceEnd = text.lastIndexOf(".", end);
+
+    if (sentenceEnd > start + 300) {
+      end = sentenceEnd + 1;
+    }
+
+    chunks.push(text.slice(start, end).trim());
+
+    start = end - overlap;
+
+    if (start < 0) start = 0;
   }
 
   return chunks;

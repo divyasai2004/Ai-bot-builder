@@ -1,10 +1,16 @@
 import ollama from "ollama";
 
 export async function generateEmbedding(text: string) {
-  const response = await ollama.embeddings({
-    model: "nomic-embed-text",
-    prompt: text,
-  });
+  try {
+    const response = await ollama.embeddings({
+      model: "nomic-embed-text",
+      prompt: text.slice(0,4000),
+    });
 
-  return response.embedding;
+    return response.embedding;
+  } catch (error) {
+    console.error("Embedding Error:", error);
+
+    return [];
+  }
 }

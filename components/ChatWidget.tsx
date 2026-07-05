@@ -1,5 +1,5 @@
 "use client";
-
+import ReactMarkdown from "react-markdown";
 import {
   useState,
   useEffect,
@@ -42,21 +42,19 @@ export default function ChatWidget({
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-xl text-xl"
-      >
-        💬
-      </button>
+  onClick={() => setIsOpen(true)}
+  className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full shadow-2xl text-2xl transition hover:scale-110"
+>
+  💬
+</button>
     );
   }
 
   return (
-    <div className="fixed bottom-5 right-5 w-96 h-[550px] bg-zinc-900 text-white border border-zinc-700 rounded-xl shadow-2xl overflow-hidden flex flex-col">
-
+<div className="fixed bottom-5 right-5 w-[370px] max-w-[95vw] h-[600px] max-h-[85vh] bg-zinc-900 text-white border border-zinc-700 rounded-xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300">
       {/* Header */}
-      <div className="bg-black px-4 py-3 flex justify-between items-center border-b border-zinc-700">
-        <span className="font-semibold">
-          💬 {botName}
+<div className="bg-zinc-900 px-5 py-4 flex justify-between items-center border-b border-zinc-700">       
+<span className="font-bold text-lg">          💬 {botName}
         </span>
 
         <button
@@ -79,13 +77,16 @@ export default function ChatWidget({
             }`}
           >
             <div
-              className={`max-w-[80%] px-4 py-2 rounded-xl text-sm ${
-                msg.sender === "user"
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-100"
+
+  className={`max-w-[82%] px-4 py-3 rounded-2xl text-sm leading-6 shadow ${                
+    msg.sender === "user"
+  ? "bg-blue-600 text-white rounded-br-md"
+  : "bg-zinc-800 text-zinc-100 rounded-bl-md"
               }`}
             >
-              {msg.text}
+  <ReactMarkdown>
+  {msg.text}
+</ReactMarkdown>
             </div>
           </div>
         ))}
@@ -102,7 +103,7 @@ export default function ChatWidget({
             setInput(e.target.value)
           }
           placeholder="Ask anything..."
-          className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white outline-none"
+          className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleSend();
@@ -112,8 +113,7 @@ export default function ChatWidget({
 
         <button
           onClick={handleSend}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white"
-        >
+className="bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-xl text-white font-medium transition"        >
           Send
         </button>
       </div>
