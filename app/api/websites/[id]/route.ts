@@ -139,78 +139,141 @@ export async function DELETE(
   req: Request,
   { params }: Props
 ) {
-  const { id } = await params;
+  try {
+    const { id } = await params;
 
-  const supabase =
-    await createSupabaseServerClient();
+    const supabase =
+      await createSupabaseServerClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Unauthorized",
-      },
-      { status: 401 }
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Unauthorized",
+        },
+        { status: 401 }
+      );
+    }
+
+    // 1. Verify that this bot belongs to the logged-in user
+    const { data: website, error: websiteError } =
+      await supabaseAdmin
+        .from("websites")
+        .select("id")
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if (websiteError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: websiteError.message,
+        },
+        { status: 500 }
+      );
+    }
+
+    if (!website) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Bot not found or access denied.",
+        },
+        { status: 404 }
+      );
+    }
+
+    // 2. Delete chat messages
+    const { error: chatError } =
+      await supabaseAdmin
+        .from("chat_messages")
+        .delete()
+        .eq("website_id", id);
+
+    if (chatError) {
+      console.error(
+        "CHAT DELETE ERROR:",
+        chatError
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: chatError.message,
+        },
+        { status: 500 }
+      );
+    }
+
+    // 3. Delete knowledge chunks
+    const { error: chunksError } =
+      await supabaseAdmin
+        .from("website_chunks")
+        .delete()
+        .eq("website_id", id);
+
+    if (chunksError) {
+      console.error(
+        "CHUNKS DELETE ERROR:",
+        chunksError
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: chunksError.message,
+        },
+        { status: 500 }
+      );
+    }
+
+    // 4. Delete website / bot
+    const { error: deleteError } =
+      await supabaseAdmin
+        .from("websites")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+    if (deleteError) {
+      console.error(
+        "BOT DELETE ERROR:",
+        deleteError
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: deleteError.message,
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Bot deleted successfully.",
+    });
+  } catch (error: any) {
+    console.error(
+      "DELETE BOT ERROR:",
+      error
     );
-  }
 
-  // First verify ownership
-  const { data: website } = await supabaseAdmin
-    .from("websites")
-    .select("id")
-    .eq("id", id)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!website) {
     return NextResponse.json(
       {
         success: false,
-        error: "Website not found or access denied.",
-      },
-      { status: 404 }
-    );
-  }
-
-  // Delete knowledge chunks only after ownership check
-  const { error: chunksError } =
-    await supabaseAdmin
-      .from("website_chunks")
-      .delete()
-      .eq("website_id", id);
-
-  if (chunksError) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: chunksError.message,
+        error:
+          error?.message ||
+          "Failed to delete bot.",
       },
       { status: 500 }
     );
   }
-
-  // Delete website
-  const { error } = await supabaseAdmin
-    .from("websites")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", user.id);
-
-  if (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: error.message,
-      },
-      { status: 500 }
-    );
-  }
-
-  return NextResponse.json({
-    success: true,
-  });
 }
+  

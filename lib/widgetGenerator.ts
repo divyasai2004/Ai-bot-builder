@@ -1,16 +1,9 @@
-export function generateWidgetCode(botConfig: any) {
-  return `
-<script>
-window.AIBotConfig = {
-  botName: "${botConfig.botName}",
-  welcomeMessage: "${botConfig.welcomeMessage}",
-  suggestedQuestions: ${JSON.stringify(
-    botConfig.suggestedQuestions
-  )}
-};
-
-console.log("AI Bot Loaded");
-console.log(window.AIBotConfig);
-</script>
-`;
+export function generateWidgetCode(
+  websiteId: string,
+  baseUrl = "http://localhost:3000"
+) {
+  return `<script
+src="${baseUrl}/widget.js"
+data-bot-id="${websiteId}">
+</script>`;
 }

@@ -96,7 +96,7 @@ function BotGreeting() {
             height="80"
             rx="22"
             fill="#12161F"
-            stroke="#22202038"
+            stroke="#26242416"
             strokeWidth="2.5"
           />
 

@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabaseAdmin } from "./supabaseAdmin";
 
 export async function saveChat(data: {
   website_id: string;
@@ -6,11 +6,23 @@ export async function saveChat(data: {
   question: string;
   answer: string;
 }) {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("chat_messages")
-    .insert(data);
+    .insert({
+      website_id: data.website_id,
+      visitor_id: data.visitor_id,
+      question: data.question,
+      answer: data.answer,
+    });
 
   if (error) {
-    console.error("Chat Save Error:", error);
+    console.error(
+      "CHAT SAVE ERROR:",
+      error
+    );
+
+    throw new Error(
+      "Failed to save chat message."
+    );
   }
 }

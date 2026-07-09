@@ -59,7 +59,40 @@ export default function WebsitePage() {
 
       if (data.success) {
 
-        setSite(data.website);
+        setSite({
+  ...data.website,
+
+  theme:
+    data.website.theme || "light",
+
+  primary_color:
+    data.website.primary_color ||
+    "#2563eb",
+
+  header_color:
+    data.website.header_color ||
+    "#2563eb",
+
+  widget_position:
+    data.website.widget_position ||
+    "right",
+
+  widget_width:
+    data.website.widget_width || 350,
+
+  border_radius:
+    data.website.border_radius || 12,
+
+  suggested_questions:
+    Array.isArray(
+      data.website.suggested_questions
+    )
+      ? data.website.suggested_questions
+      : [],
+
+  is_active:
+    data.website.is_active !== false,
+});
 
         setQuestionsText(
           (
@@ -78,73 +111,84 @@ export default function WebsitePage() {
 
 
   async function saveBot() {
+  if (!site) return;
 
-    setSaving(true);
+  setSaving(true);
 
-    const updatedSite = {
+  const updatedQuestions = questionsText
+    .split("\n")
+    .map((question) => question.trim())
+    .filter((question) => question !== "");
 
-      ...site,
+  const payload = {
+    bot_name: site.bot_name,
+    welcome_message: site.welcome_message,
 
-      suggested_questions:
-        questionsText
-          .split("\n")
-          .map((question) =>
-            question.trim()
-          )
-          .filter(
-            (question) =>
-              question !== ""
-          ),
-    };
+    theme: site.theme || "light",
 
+    suggested_questions: updatedQuestions,
 
-    try {
+    primary_color:
+      site.primary_color || "#2563eb",
 
-      const res = await fetch(
-        `/api/websites/${params.id}`,
-        {
-          method: "PUT",
+    header_color:
+      site.header_color || "#2563eb",
 
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
+    widget_position:
+      site.widget_position || "right",
 
-          body:
-            JSON.stringify(
-              updatedSite
-            ),
-        }
-      );
+    widget_width:
+      Number(site.widget_width) || 350,
 
-      const data = await res.json();
+    border_radius:
+      Number(site.border_radius) || 12,
 
-      if (data.success) {
+    logo_url:
+      site.logo_url || null,
 
-        setSite(updatedSite);
+    is_active:
+      site.is_active === true,
+  };
 
-        alert(
-          "Bot updated successfully!"
-        );
+  try {
+    const res = await fetch(
+      `/api/websites/${params.id}`,
+      {
+        method: "PUT",
 
-      } else {
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-        alert(data.error);
+        body: JSON.stringify(payload),
       }
+    );
 
-    } catch (error) {
+    const data = await res.json();
 
-      console.error(error);
-
-      alert(
-        "Could not save changes."
+    if (!res.ok || !data.success) {
+      throw new Error(
+        data.error || "Could not save changes."
       );
-
-    } finally {
-
-      setSaving(false);
     }
+
+    setSite((prev: any) => ({
+      ...prev,
+      ...payload,
+    }));
+
+    alert("Bot updated successfully!");
+  } catch (error: any) {
+    console.error("SAVE ERROR:", error);
+
+    alert(
+      error.message ||
+        "Could not save changes."
+    );
+  } finally {
+    setSaving(false);
   }
+}
 
 
   const widgetScript =
@@ -1109,10 +1153,10 @@ How can I contact support?`}
 
                 <button
                   onClick={() =>
-                    window.open(
-                      "/test",
-                      "_blank"
-                    )
+                   window.open(
+  `/test?botId=${site.id}`,
+  "_blank"
+)
                   }
                   className="
                     inline-flex
@@ -1322,7 +1366,12 @@ How can I contact support?`}
                     site.border_radius ||
                     12
                   }
-                />
+suggestedQuestions={
+  questionsText
+    .split("\n")
+    .map((question) => question.trim())
+    .filter((question) => question !== "")
+}                />
 
               </div>
 

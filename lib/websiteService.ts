@@ -4,32 +4,63 @@ export async function getWebsite(
   url: string,
   userId: string
 ) {
-  const { data } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from("websites")
     .select("*")
     .eq("website_url", url)
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
+
+  if (error) {
+    console.error(
+      "GET WEBSITE ERROR:",
+      error
+    );
+
+    throw error;
+  }
 
   return data;
 }
 
-export async function saveWebsite(data: {
+interface SaveWebsiteData {
   user_id: string;
 
   website_url: string;
+
   industry: string;
+
   business_type: string;
 
   bot_name: string;
+
   welcome_message: string;
+
   theme: string;
+
   suggested_questions: string[];
 
   website_content: string;
+
   analysis_json: any;
+
   products: string[];
-}) {
+}
+
+export async function saveWebsite(
+  data: SaveWebsiteData
+) {
+  console.log(
+    "========== SAVING WEBSITE =========="
+  );
+
+  console.log({
+    website_url: data.website_url,
+    industry: data.industry,
+    business_type: data.business_type,
+    bot_name: data.bot_name,
+  });
+
   const { data: website, error } =
     await supabaseAdmin
       .from("websites")
@@ -37,7 +68,14 @@ export async function saveWebsite(data: {
       .select()
       .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error(
+      "SAVE WEBSITE ERROR:",
+      error
+    );
+
+    throw error;
+  }
 
   return website;
 }

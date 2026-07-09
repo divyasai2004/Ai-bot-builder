@@ -209,11 +209,27 @@ const theme = {
     logo.alt = bot.bot_name || "Chatbot";
 
     Object.assign(logo.style, {
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      objectFit: "cover",
-    });
+  display: "block",
+
+  width: "100%",
+  height: "100%",
+
+  minWidth: "100%",
+  minHeight: "100%",
+
+  borderRadius: "50%",
+
+  objectFit: "cover",
+  objectPosition: "center",
+
+  padding: "0",
+  margin: "0",
+
+  border: "none",
+  boxSizing: "border-box",
+
+  pointerEvents: "none",
+});
 
     button.appendChild(logo);
   } else {
@@ -236,13 +252,21 @@ const theme = {
     bottom: "24px",
 
     width: "68px",
-    height: "68px",
+height: "68px",
 
-    borderRadius: "999px",
-    border: "none",
+minWidth: "68px",
+minHeight: "68px",
 
-    background:
-      bot.primary_color || "#2563eb",
+padding: "0",
+margin: "0",
+
+borderRadius: "50%",
+border: "none",
+
+boxSizing: "border-box",
+
+background:
+  bot.primary_color || "#2563eb",
 
     color: "#fff",
     fontSize: "28px",
