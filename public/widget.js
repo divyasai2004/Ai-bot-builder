@@ -162,20 +162,43 @@ const theme = {
   let history = [...savedMessages];
 
   // =========================================================
-  // VISITOR ID
-  // =========================================================
+// VISITOR ID
+// =========================================================
 
-  let visitorId =
-    localStorage.getItem("ai_visitor_id");
+const VISITOR_KEY =
+  `ai_visitor_id_${botId}`;
 
-  if (!visitorId) {
-    visitorId = crypto.randomUUID();
+let visitorId =
+  localStorage.getItem(VISITOR_KEY);
 
-    localStorage.setItem(
-      "ai_visitor_id",
-      visitorId
-    );
-  }
+if (!visitorId) {
+  visitorId = crypto.randomUUID();
+
+  localStorage.setItem(
+    VISITOR_KEY,
+    visitorId
+  );
+}
+
+
+// =========================================================
+// CONVERSATION ID
+// =========================================================
+
+const CONVERSATION_KEY =
+  `ai_conversation_id_${botId}`;
+
+let conversationId =
+  sessionStorage.getItem(CONVERSATION_KEY);
+
+if (!conversationId) {
+  conversationId = crypto.randomUUID();
+
+  sessionStorage.setItem(
+    CONVERSATION_KEY,
+    conversationId
+  );
+}
 
   // =========================================================
   // SECURITY HELPER
@@ -664,18 +687,26 @@ color:
   // CLEAR CHAT
   // =========================================================
 
-  clear.onclick = () => {
-    history = [];
+ clear.onclick = () => {
+  history = [];
 
-    localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(STORAGE_KEY);
 
-    messages.innerHTML = "";
+  // Create a new conversation
+  conversationId = crypto.randomUUID();
 
-    renderWelcomeMessage();
-    renderSuggestions();
+  sessionStorage.setItem(
+    CONVERSATION_KEY,
+    conversationId
+  );
 
-    input.focus();
-  };
+  messages.innerHTML = "";
+
+  renderWelcomeMessage();
+  renderSuggestions();
+
+  input.focus();
+};
 
   // =========================================================
   // SEND MESSAGE
@@ -781,14 +812,15 @@ color:
               "application/json",
           },
 
-          body: JSON.stringify({
-            question,
-            websiteId: botId,
-            visitorId,
+         body: JSON.stringify({
+  question,
+  websiteId: botId,
+  visitorId,
+  conversationId,
 
-            // Send only messages BEFORE current question
-            history: previousHistory,
-          }),
+  // Send only messages BEFORE current question
+  history: previousHistory,
+}),
         }
       );
 

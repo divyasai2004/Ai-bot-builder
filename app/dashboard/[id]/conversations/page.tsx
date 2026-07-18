@@ -21,15 +21,18 @@ import {
 interface Chat {
   id: string;
   visitor_id: string;
+  conversation_id: string | null;
   question: string;
   answer: string;
   created_at: string;
 }
 
 interface Conversation {
+  conversationId: string;
   visitorId: string;
   chats: Chat[];
   messageCount: number;
+  startedAt: string;
   lastActivity: string;
 }
 
@@ -42,8 +45,10 @@ export default function ConversationsPage() {
     []
   );
 
-  const [selectedVisitor, setSelectedVisitor] =
-    useState<string>("");
+  const [
+  selectedConversationId,
+  setSelectedConversationId,
+] = useState<string>("");
 
   const [search, setSearch] =
     useState("");
@@ -85,13 +90,6 @@ export default function ConversationsPage() {
 
         setChats(loadedChats);
 
-        if (
-          loadedChats.length > 0
-        ) {
-          setSelectedVisitor(
-            loadedChats[0].visitor_id
-          );
-        }
       } catch (error: any) {
         console.error(error);
 
@@ -109,31 +107,38 @@ export default function ConversationsPage() {
     }
   }, [websiteId]);
 
-  // ==========================================
-  // GROUP BY VISITOR
-  // ==========================================
+ // ==========================================
+// GROUP BY CONVERSATION
+// ==========================================
 
-  const conversations =
-    useMemo<Conversation[]>(() => {
-      const grouped: Record<
-        string,
-        Chat[]
-      > = {};
+const conversations =
+  useMemo<Conversation[]>(() => {
+    const grouped: Record<
+      string,
+      Chat[]
+    > = {};
 
-      chats.forEach((chat) => {
-        if (!grouped[chat.visitor_id]) {
-          grouped[chat.visitor_id] = [];
-        }
+    chats.forEach((chat) => {
+      const conversationKey =
+        chat.conversation_id ||
+        chat.visitor_id ||
+        chat.id;
 
-        grouped[chat.visitor_id].push(
-          chat
-        );
-      });
+      if (!grouped[conversationKey]) {
+        grouped[conversationKey] = [];
+      }
 
-      return Object.entries(grouped)
-        .map(([visitorId, visitorChats]) => {
+      grouped[conversationKey].push(chat);
+    });
+
+    return Object.entries(grouped)
+      .map(
+        ([
+          conversationId,
+          conversationChats,
+        ]) => {
           const sortedChats = [
-            ...visitorChats,
+            ...conversationChats,
           ].sort(
             (a, b) =>
               new Date(
@@ -145,28 +150,53 @@ export default function ConversationsPage() {
           );
 
           return {
-            visitorId,
+            conversationId,
+
+            visitorId:
+              sortedChats[0]
+                ?.visitor_id ||
+              "anonymous",
+
             chats: sortedChats,
 
             messageCount:
               sortedChats.length,
+
+            startedAt:
+              sortedChats[0]
+                .created_at,
 
             lastActivity:
               sortedChats[
                 sortedChats.length - 1
               ].created_at,
           };
-        })
-        .sort(
-          (a, b) =>
-            new Date(
-              b.lastActivity
-            ).getTime() -
-            new Date(
-              a.lastActivity
-            ).getTime()
-        );
-    }, [chats]);
+        }
+      )
+      .sort(
+        (a, b) =>
+          new Date(
+            b.lastActivity
+          ).getTime() -
+          new Date(
+            a.lastActivity
+          ).getTime()
+      );
+  }, [chats]);
+
+  useEffect(() => {
+  if (
+    conversations.length > 0 &&
+    !selectedConversationId
+  ) {
+    setSelectedConversationId(
+      conversations[0].conversationId
+    );
+  }
+}, [
+  conversations,
+  selectedConversationId,
+]);
 
   // ==========================================
   // SEARCH
@@ -179,9 +209,13 @@ export default function ConversationsPage() {
           search.toLowerCase();
 
         return (
-          conversation.visitorId
-            .toLowerCase()
-            .includes(value) ||
+  conversation.conversationId
+    .toLowerCase()
+    .includes(value) ||
+
+  conversation.visitorId
+    .toLowerCase()
+    .includes(value) ||
           conversation.chats.some(
             (chat) =>
               chat.question
@@ -200,11 +234,11 @@ export default function ConversationsPage() {
   // ==========================================
 
   const activeConversation =
-    conversations.find(
-      (conversation) =>
-        conversation.visitorId ===
-        selectedVisitor
-    );
+  conversations.find(
+    (conversation) =>
+      conversation.conversationId ===
+      selectedConversationId
+  );
 
   // ==========================================
   // LOADING
@@ -373,8 +407,8 @@ export default function ConversationsPage() {
                 (conversation) => {
 
                   const selected =
-                    selectedVisitor ===
-                    conversation.visitorId;
+  selectedConversationId ===
+  conversation.conversationId;
 
                   const latestChat =
                     conversation.chats[
@@ -384,14 +418,13 @@ export default function ConversationsPage() {
 
                   return (
                     <button
-                      key={
-                        conversation.visitorId
-                      }
+                      key={  conversation.conversationId
+}
                       onClick={() =>
-                        setSelectedVisitor(
-                          conversation.visitorId
-                        )
-                      }
+  setSelectedConversationId(
+    conversation.conversationId
+  )
+}
                       className={`w-full border-b border-zinc-100 p-4 text-left transition ${
                         selected
                           ? "bg-blue-50"
@@ -419,7 +452,7 @@ export default function ConversationsPage() {
                           <div className="flex items-center justify-between gap-2">
 
                             <p className="truncate text-sm font-semibold text-zinc-900">
-                              Visitor
+                                 Conversation
                             </p>
 
                             <span className="shrink-0 text-[11px] text-zinc-400">
@@ -500,7 +533,7 @@ export default function ConversationsPage() {
                     <div>
 
                       <p className="font-semibold text-zinc-950">
-                        Visitor Conversation
+                            Conversation
                       </p>
 
                       <p className="max-w-[220px] truncate font-mono text-xs text-zinc-400 md:max-w-md">

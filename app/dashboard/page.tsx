@@ -12,6 +12,7 @@ import {
   Layers,
   ArrowUpRight,
   Sparkles,
+  MessageSquare,
 } from "lucide-react";
 
 interface Website {
@@ -262,6 +263,13 @@ export default function Dashboard() {
                       Details
                       <ArrowUpRight size={13} />
                     </Link>
+                    <Link
+  href={`/playground/${site.id}`}
+  className="inline-flex items-center gap-1.5 bg-[#7C6CFF]/10 text-[#9C93FF] border border-[#7C6CFF]/20 px-3.5 py-2 rounded-lg text-xs font-medium hover:bg-[#7C6CFF]/20 transition-colors"
+>
+  <MessageSquare size={14} />
+  Playground
+</Link>
 
                     <button
                       onClick={() => deleteBot(site.id)}

@@ -16,7 +16,7 @@ export async function GET(
     const { id } = await params;
 
     // ==========================================
-    // AUTHENTICATE USER
+    // 1. AUTHENTICATE USER
     // ==========================================
 
     const supabase =
@@ -39,7 +39,7 @@ export async function GET(
     }
 
     // ==========================================
-    // VERIFY BOT OWNERSHIP
+    // 2. VERIFY BOT OWNERSHIP
     // ==========================================
 
     const {
@@ -47,7 +47,7 @@ export async function GET(
       error: websiteError,
     } = await supabaseAdmin
       .from("websites")
-      .select("id")
+      .select("id, bot_name, website_url")
       .eq("id", id)
       .eq("user_id", user.id)
       .maybeSingle();
@@ -78,7 +78,7 @@ export async function GET(
     }
 
     // ==========================================
-    // LOAD CONVERSATIONS
+    // 3. LOAD CHAT MESSAGES
     // ==========================================
 
     const {
@@ -89,6 +89,7 @@ export async function GET(
       .select(`
         id,
         visitor_id,
+        conversation_id,
         question,
         answer,
         created_at
@@ -110,8 +111,19 @@ export async function GET(
       );
     }
 
+    // ==========================================
+    // 4. RESPONSE
+    // ==========================================
+
     return NextResponse.json({
       success: true,
+
+      bot: {
+        id: website.id,
+        botName: website.bot_name,
+        websiteUrl: website.website_url,
+      },
+
       chats: chats || [],
     });
   } catch (error) {

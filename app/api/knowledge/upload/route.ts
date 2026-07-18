@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import mammoth from "mammoth";
-
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import { chunkText } from "../../../../lib/chunkText";
 import { saveChunks } from "../../../../lib/vectorStore";
 
@@ -11,7 +11,34 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const DOCX_TYPE =
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+async function extractPdfText(
+  buffer: Buffer
+) {
+  const pdf = await pdfjsLib.getDocument({
+    data: new Uint8Array(buffer),
+  }).promise;
 
+  let text = "";
+
+  for (
+    let pageNum = 1;
+    pageNum <= pdf.numPages;
+    pageNum++
+  ) {
+    const page =
+      await pdf.getPage(pageNum);
+
+    const content =
+      await page.getTextContent();
+
+    text +=
+      content.items
+        .map((item: any) => item.str)
+        .join(" ") + "\n";
+  }
+
+  return text;
+}
 export async function POST(req: Request) {
   try {
     // ==========================================
@@ -157,31 +184,20 @@ export async function POST(req: Request) {
       file.type === "application/pdf" ||
       lowerName.endsWith(".pdf");
 
-    if (isPdf) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "PDF upload is temporarily disabled. Please upload TXT or DOCX files.",
-        },
-        {
-          status: 400,
-        }
-      );
+   if (!isTxt && !isDocx && !isPdf) {
+  return NextResponse.json(
+    {
+      success: false,
+      error:
+        "Unsupported file type. Please upload TXT, DOCX or PDF.",
+    },
+    {
+      status: 400,
     }
+  );
+}
 
-    if (!isTxt && !isDocx) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Unsupported file type. Please upload a TXT or DOCX file.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
+    
 
     // ==========================================
     // 6. EXTRACT TEXT
@@ -195,17 +211,22 @@ export async function POST(req: Request) {
 
     let text = "";
 
-    if (isDocx) {
-      const result =
-        await mammoth.extractRawText({
-          buffer,
-        });
+    if (isPdf) {
+  text = await extractPdfText(buffer);
+}
 
-      text = result.value;
-    } else {
-      text =
-        buffer.toString("utf8");
-    }
+else if (isDocx) {
+  const result =
+    await mammoth.extractRawText({
+      buffer,
+    });
+
+  text = result.value;
+}
+
+else {
+  text = buffer.toString("utf8");
+}
 
     // ==========================================
     // 7. CLEAN TEXT

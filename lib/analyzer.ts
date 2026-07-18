@@ -1,5 +1,8 @@
-import ollama from "ollama";
+import "server-only";
 
+import {
+  generateChatResponse,
+} from "./ai/chat";
 export async function analyzeBusiness(
   content: string
 ) {
@@ -121,25 +124,12 @@ Analyze the following website content:
 ${content}
 `;
 
-  const response = await ollama.chat({
-    model: "qwen2.5:1.5b",
-
-    format: "json",
-
-    options: {
-      temperature: 0.1,
-    },
-
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
+ const result =
+  await generateChatResponse({
+    prompt,
+    temperature: 0.1,
+    jsonMode: true,
   });
-
-  const result =
-    response.message?.content?.trim();
 
   if (!result) {
     throw new Error(
