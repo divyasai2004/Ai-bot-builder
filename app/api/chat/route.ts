@@ -5,6 +5,7 @@ import {
 import { searchRelevantChunks } from "../../../lib/rag";
 import { saveChat } from "../../../lib/chatService";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { chatRateLimit } from "@/lib/rateLimiter";
 
 // ==========================================================
 // CORS
@@ -16,34 +17,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-// ==========================================================
-// BASIC DEVELOPMENT RATE LIMITER
-//
-// IMPORTANT:
-// This is suitable for local development / single-server MVP.
-//
-// Later, for production deployment, replace this with
-// Redis / Upstash / another shared rate-limit store.
-// ==========================================================
-
-const RATE_LIMIT_WINDOW = 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 15;
-
-type RateLimitEntry = {
-  count: number;
-  resetAt: number;
-};
-
-const globalForRateLimit = globalThis as typeof globalThis & {
-  aiChatRateLimit?: Map<string, RateLimitEntry>;
-};
-
-const rateLimitStore =
-  globalForRateLimit.aiChatRateLimit ??
-  new Map<string, RateLimitEntry>();
-
-globalForRateLimit.aiChatRateLimit =
-  rateLimitStore;
 
 // ==========================================================
 // TYPES
@@ -66,58 +39,22 @@ interface ChatRequestBody {
 // HELPERS
 // ==========================================================
 
-function getClientIdentifier(
+function getClientIP(req: Request): string {
+  const forwardedFor = req.headers.get("x-forwarded-for");
+
+  return (
+    forwardedFor?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown-ip"
+  );
+}
+
+function createRateLimitIdentifier(
   req: Request,
   websiteId: string,
   visitorId: string
 ) {
-  const forwardedFor =
-    req.headers.get("x-forwarded-for");
-
-  const ip =
-    forwardedFor
-      ?.split(",")[0]
-      ?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown-ip";
-
-  return `${websiteId}:${visitorId}:${ip}`;
-}
-
-function isRateLimited(key: string) {
-  const now = Date.now();
-
-  const current =
-    rateLimitStore.get(key);
-
-  if (
-    !current ||
-    now >= current.resetAt
-  ) {
-    rateLimitStore.set(key, {
-      count: 1,
-      resetAt:
-        now + RATE_LIMIT_WINDOW,
-    });
-
-    return false;
-  }
-
-  if (
-    current.count >=
-    RATE_LIMIT_MAX_REQUESTS
-  ) {
-    return true;
-  }
-
-  current.count += 1;
-
-  rateLimitStore.set(
-    key,
-    current
-  );
-
-  return false;
+  return `${websiteId}:${visitorId}:${getClientIP(req)}`;
 }
 
 function cleanHistory(
@@ -308,63 +245,52 @@ export async function POST(
     }
 
     // ======================================================
-    // 4. RATE LIMIT
-    // ======================================================
+// 4. PRODUCTION RATE LIMIT (UPSTASH)
+// ======================================================
 
-    const rateLimitKey =
-      getClientIdentifier(
-        req,
-        websiteId,
-        visitorId
-      );
+const identifier = createRateLimitIdentifier(
+  req,
+  websiteId,
+  visitorId
+);
 
-    if (
-      isRateLimited(
-        rateLimitKey
-      )
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
+const {
+  success,
+  remaining,
+  reset,
+} = await chatRateLimit.limit(identifier);
 
-          error:
-            "Too many messages. Please wait a moment and try again.",
-        },
-        {
-          status: 429,
-
-          headers: {
-            ...corsHeaders,
-
-            "Retry-After": "60",
-          },
-        }
-      );
+if (!success) {
+  return NextResponse.json(
+    {
+      success: false,
+      error:
+        "Too many requests. Please wait before sending another message.",
+    },
+    {
+      status: 429,
+      headers: {
+        ...corsHeaders,
+        "Retry-After": String(
+          Math.max(
+            1,
+            Math.ceil((reset - Date.now()) / 1000)
+          )
+        ),
+        "X-RateLimit-Remaining": String(
+          remaining
+        ),
+      },
     }
+  );
+}
 
-    console.log(
-      "========== CHAT REQUEST =========="
-    );
-
-    console.log(
-      "QUESTION:",
-      question
-    );
-
-    console.log(
-      "WEBSITE ID:",
-      websiteId
-    );
-
-    console.log(
-      "VISITOR ID:",
-      visitorId
-    );
-
-    console.log(
-      "CONVERSATION ID:",
-      conversationId
-    );
+console.log("========== CHAT REQUEST ==========");
+console.log("QUESTION:", question);
+console.log("WEBSITE ID:", websiteId);
+console.log("VISITOR ID:", visitorId);
+console.log("CONVERSATION ID:", conversationId);
+console.log("CLIENT:", identifier);
 
     // ======================================================
     // 5. CHECK BOT
@@ -597,21 +523,18 @@ Answer:
           controller
         ) {
           try {
-            for await (
-              const chunk of response
-            ) {
-              const text =
-                chunk.message
-                  ?.content || "";
+            for await (const chunk of response) {
+  const text =
+    chunk.choices?.[0]?.delta?.content ?? "";
 
-              fullAnswer += text;
+  if (!text) continue;
 
-              controller.enqueue(
-                encoder.encode(
-                  text
-                )
-              );
-            }
+  fullAnswer += text;
+
+  controller.enqueue(
+    encoder.encode(text)
+  );
+}
 
             const finalAnswer =
               fullAnswer.trim() ||

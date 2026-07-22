@@ -1,3 +1,4 @@
+// Superseded by middleware.ts — kept for reference only.
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 

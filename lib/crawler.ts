@@ -4,6 +4,7 @@ import puppeteer, {
 } from "puppeteer";
 
 import { rankLinks } from "./linkRanker";
+import { isSafeUrl } from "./ssrfProtection";
 
 /*
 |--------------------------------------------------------------------------
@@ -43,13 +44,30 @@ async function configurePage(page: Page) {
 
   await page.setRequestInterception(true);
 
-  page.on("request", (request) => {
-    const type = request.resourceType();
+  page.on("request", async (request) => {
+    try {
+      const targetUrl = request.url();
+      const type = request.resourceType();
 
-    if (BLOCKED_RESOURCE_TYPES.has(type)) {
-      request.abort();
-    } else {
-      request.continue();
+      if (BLOCKED_RESOURCE_TYPES.has(type)) {
+        await request.abort();
+        return;
+      }
+
+      // Check if URL is safe to prevent SSRF
+      const safe = await isSafeUrl(targetUrl);
+      if (!safe) {
+        console.warn(`SSRF Prevention: Aborted request to unsafe URL: ${targetUrl}`);
+        await request.abort("blockedbyclient");
+        return;
+      }
+
+      await request.continue();
+    } catch (err) {
+      console.error("Error in request interception:", err);
+      try {
+        await request.abort();
+      } catch {}
     }
   });
 }
@@ -276,6 +294,10 @@ async function crawlInternalPage(
 export async function crawlWebsite(
   url: string
 ) {
+  if (!(await isSafeUrl(url))) {
+    throw new Error("Access to private or local network addresses is not allowed.");
+  }
+
   console.log(
     "========== CRAWLING WEBSITE =========="
   );
@@ -391,6 +413,10 @@ export async function crawlWebsite(
       const pageTexts: string[] = [];
 
       for (const link of pagesToVisit) {
+        if (!(await isSafeUrl(link))) {
+          console.warn(`SSRF Prevention: Skipped crawling unsafe link: ${link}`);
+          continue;
+        }
         const text =
           await crawlInternalPage(
             browser,

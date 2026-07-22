@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import {
   Activity,
   Bot,
@@ -47,11 +48,8 @@ interface Analytics {
   recentChats: Chat[];
 }
 
-export default function AnalyticsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function AnalyticsPage() {
+  const params = useParams<{ id: string }>();
   const [analytics, setAnalytics] =
     useState<Analytics | null>(null);
 

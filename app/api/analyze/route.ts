@@ -17,6 +17,7 @@ import { saveChunks } from "../../../lib/vectorStore";
 import { cleanWebsite } from "../../../lib/cleanWebsite";
 import { cleanContent } from "../../../lib/contentCleaner";
 import { createSupabaseServerClient } from "@/lib/supabaseServer";
+import { isSafeUrl } from "../../../lib/ssrfProtection";
 
 
 export async function POST(req: Request) {
@@ -106,6 +107,20 @@ export async function POST(req: Request) {
         }
       );
 
+    }
+
+    // SSRF URL Safety Validation
+    const isSafe = await isSafeUrl(url);
+    if (!isSafe) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Access to private or local network addresses is not allowed.",
+        },
+        {
+          status: 400,
+        }
+      );
     }
 
 
