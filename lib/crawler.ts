@@ -1,7 +1,8 @@
+import chromium from "@sparticuz/chromium";
 import puppeteer, {
   Browser,
   Page,
-} from "puppeteer";
+} from "puppeteer-core";
 
 import { rankLinks } from "./linkRanker";
 import { isSafeUrl } from "./ssrfProtection";
@@ -305,22 +306,16 @@ export async function crawlWebsite(
   console.log("URL:", url);
 
   const browser = await puppeteer.launch({
-    headless: true,
+  args: [
+    ...chromium.args,
+    "--disable-http2",
+  ],
 
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
+  executablePath:
+    await chromium.executablePath(),
 
-      /*
-      Important for some websites that produce
-      HTTP/2 protocol problems in automated Chromium.
-      */
-
-      "--disable-http2",
-    ],
-  });
+  headless: true,
+});
 
   try {
     /*
