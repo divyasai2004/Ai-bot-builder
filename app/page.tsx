@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseClient } from "@/lib/supabaseClient";
-import type { User } from "@supabase/supabase-js";
 import {
   Bot,
   Globe,
@@ -22,14 +20,17 @@ import {
   ChevronDown,
   RefreshCw,
   Send,
-  Terminal,
-  Layers,
   Lock,
-  ExternalLink,
-  MessageSquare,
   Activity,
 } from "lucide-react";
 import Link from "next/link";
+
+const HERO_PHRASES = [
+  "Ask me anything about your site",
+  "Sub-300ms Groq streaming response",
+  "Zero hallucinations • 100% grounded",
+  "Embed anywhere with 1 line of code",
+];
 
 /* =========================================================
    AMBIENT COSMIC BACKGROUND & GLOW EFFECTS
@@ -92,19 +93,12 @@ function AmbientCosmicBackground() {
    FLOATING INTERACTIVE MASCOT WITH TYPING SPEECH BUBBLE
 ========================================================= */
 function FloatingBotMascot() {
-  const phrases = [
-    "Ask me anything about your site",
-    "Sub-300ms Groq streaming response",
-    "Zero hallucinations • 100% grounded",
-    "Embed anywhere with 1 line of code",
-  ];
-
   const [text, setText] = useState("");
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const current = phrases[phraseIndex % phrases.length];
+    const current = HERO_PHRASES[phraseIndex % HERO_PHRASES.length];
     const delay = deleting ? 35 : 75;
 
     if (!deleting && text === current) {
@@ -115,7 +109,7 @@ function FloatingBotMascot() {
     if (deleting && text === "") {
       const nextPhraseTimeout = setTimeout(() => {
         setDeleting(false);
-        setPhraseIndex((prev) => (prev + 1) % phrases.length);
+        setPhraseIndex((prev) => (prev + 1) % HERO_PHRASES.length);
       }, 0);
       return () => clearTimeout(nextPhraseTimeout);
     }
@@ -661,7 +655,7 @@ function FaqAccordion() {
 export default function LandingPage() {
   const router = useRouter();
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<{ id: string; email: string | null } | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [inputUrl, setInputUrl] = useState("");
   const [activeTheme, setActiveTheme] = useState<
@@ -669,16 +663,29 @@ export default function LandingPage() {
   >("violet");
 
   useEffect(() => {
-    async function loadUser() {
-      const {
-        data: { user },
-      } = await supabaseClient.auth.getUser();
+    let active = true;
 
-      setUser(user);
-      setLoadingUser(false);
-    }
+    fetch("/api/auth/session", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Could not read the current session.");
+        return response.json() as Promise<{
+          user: { id: string; email: string | null } | null;
+        }>;
+      })
+      .then(({ user }) => {
+        if (active) setUser(user);
+      })
+      .catch((error) => {
+        console.error("Failed to load the current session:", error);
+        if (active) setUser(null);
+      })
+      .finally(() => {
+        if (active) setLoadingUser(false);
+      });
 
-    loadUser();
+    return () => {
+      active = false;
+    };
   }, []);
 
   function handleStart(targetUrl?: string) {
@@ -703,7 +710,12 @@ export default function LandingPage() {
   }
 
   async function handleLogout() {
-    await supabaseClient.auth.signOut();
+    const { supabaseClient } = await import("@/lib/supabaseClient");
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+      console.error("Failed to log out:", error);
+      return;
+    }
     setUser(null);
     router.refresh();
   }
