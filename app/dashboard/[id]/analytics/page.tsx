@@ -111,19 +111,19 @@ export default function AnalyticsPage() {
         ).toFixed(1);
 
   return (
-    <main className="min-h-screen bg-zinc-50 p-8">
+    <main className="min-h-screen bg-zinc-50 p-4 sm:p-6 md:p-8">
 
       {/* Header */}
 
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
 
         <div>
 
-          <h1 className="text-4xl font-bold">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
             Analytics Dashboard
           </h1>
 
-          <p className="text-zinc-500 mt-2">
+          <p className="text-zinc-500 text-sm mt-1 sm:mt-2">
             Track visitors, conversations and chatbot usage.
           </p>
 
@@ -131,7 +131,7 @@ export default function AnalyticsPage() {
 
         <button
           onClick={exportCSV}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-semibold"
+          className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-semibold text-sm transition shrink-0"
         >
           <Download size={18} />
 
@@ -143,25 +143,25 @@ export default function AnalyticsPage() {
 
       {/* Bot + Website */}
 
-      <div className="flex flex-wrap gap-5 mb-8">
+      <div className="grid sm:grid-cols-3 gap-4 mb-6 sm:mb-8">
 
-        <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex-1">
+        <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 sm:p-6 sm:col-span-1">
 
           <div className="flex items-center gap-3">
 
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
 
               <Bot className="text-blue-600" />
 
             </div>
 
-            <div>
+            <div className="min-w-0">
 
-              <p className="text-zinc-500 text-sm">
+              <p className="text-zinc-500 text-xs">
                 Bot
               </p>
 
-              <h2 className="font-bold text-lg">
+              <h2 className="font-bold text-base sm:text-lg truncate">
                 {analytics.botName}
               </h2>
 
@@ -171,26 +171,26 @@ export default function AnalyticsPage() {
 
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex-[2]">
+        <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 sm:p-6 sm:col-span-2">
 
           <div className="flex items-center gap-3">
 
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
 
               <Globe className="text-green-600" />
 
             </div>
 
-            <div>
+            <div className="min-w-0">
 
-              <p className="text-zinc-500 text-sm">
+              <p className="text-zinc-500 text-xs">
                 Website
               </p>
 
               <a
                 href={analytics.websiteUrl}
                 target="_blank"
-                className="font-semibold text-blue-600 hover:underline break-all"
+                className="font-semibold text-sm sm:text-base text-blue-600 hover:underline break-all"
               >
                 {analytics.websiteUrl}
               </a>
@@ -205,7 +205,7 @@ export default function AnalyticsPage() {
 
       {/* Metric Cards */}
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
 
         <MetricCard
           title="Visitors"
@@ -256,13 +256,13 @@ export default function AnalyticsPage() {
         />
       </div>
       
-            {/* Activity + Top Questions */}
+      {/* Activity + Top Questions */}
 
       <div className="grid lg:grid-cols-3 gap-6 mt-8">
 
         {/* Activity */}
 
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-zinc-200 p-6">
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 sm:p-6">
 
           <h2 className="text-xl font-bold">
             Activity (Last 7 Days)
@@ -272,7 +272,8 @@ export default function AnalyticsPage() {
             Number of questions received each day.
           </p>
 
-          <div className="mt-8 flex items-end justify-between gap-3 h-64">
+          <div className="mt-8 overflow-x-auto pb-2">
+            <div className="flex items-end justify-between gap-3 h-64 min-w-[320px]">
 
             {analytics.activityLast7Days.map(
               (day) => {
@@ -321,12 +322,13 @@ export default function AnalyticsPage() {
             )}
 
           </div>
+          </div>
 
         </div>
 
         {/* Top Questions */}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-5 sm:p-6">
 
           <h2 className="text-xl font-bold">
             Top Questions
@@ -358,13 +360,13 @@ export default function AnalyticsPage() {
 
                   <div className="flex justify-between items-center">
 
-                    <span className="font-semibold">
+                    <span className="font-semibold text-sm">
 
                       #{index + 1}
 
                     </span>
 
-                    <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
+                    <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-medium">
 
                       {item.count}×
 
@@ -372,7 +374,7 @@ export default function AnalyticsPage() {
 
                   </div>
 
-                  <p className="mt-3 text-sm leading-relaxed">
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-700">
 
                     {item.question}
 
@@ -402,7 +404,7 @@ export default function AnalyticsPage() {
         <div className="space-y-6">
                    {analytics.recentChats.length === 0 ? (
 
-            <div className="bg-white border border-zinc-200 rounded-2xl p-10 text-center text-zinc-500">
+            <div className="bg-white border border-zinc-200 rounded-2xl p-8 sm:p-10 text-center text-zinc-500">
 
               No conversations yet.
 
@@ -419,17 +421,17 @@ export default function AnalyticsPage() {
 
                 {/* Header */}
 
-                <div className="flex items-center justify-between px-6 py-4 border-b">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 sm:px-6 py-4 border-b gap-1.5">
 
-                  <div>
+                  <div className="min-w-0">
 
-                    <div className="font-semibold">
+                    <div className="font-semibold text-sm">
 
                       Visitor
 
                     </div>
 
-                    <div className="text-sm text-zinc-500 font-mono">
+                    <div className="text-xs sm:text-sm text-zinc-500 font-mono break-all">
 
                       {chat.visitor_id}
 
@@ -437,7 +439,7 @@ export default function AnalyticsPage() {
 
                   </div>
 
-                  <div className="text-xs text-zinc-400">
+                  <div className="text-xs text-zinc-400 shrink-0">
 
                     {new Date(
                       chat.created_at
@@ -449,7 +451,7 @@ export default function AnalyticsPage() {
 
                 {/* Question */}
 
-                <div className="p-6">
+                <div className="p-5 sm:p-6">
 
                   <div className="text-sm font-semibold text-zinc-500">
 

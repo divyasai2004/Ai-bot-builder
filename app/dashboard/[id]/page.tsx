@@ -16,6 +16,9 @@ import {
   Power,
   HelpCircle,
   CheckCircle2,
+  Sparkles,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 
 import {
@@ -24,6 +27,7 @@ import {
 } from "react";
 
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 import WidgetPreview from "@/components/WidgetPreview";
 
@@ -45,6 +49,11 @@ export default function WebsitePage() {
     questionsText,
     setQuestionsText,
   ] = useState("");
+
+  const [uploadingLogo, setUploadingLogo] =
+    useState(false);
+  const [logoNotice, setLogoNotice] =
+    useState<string | null>(null);
 
 
   useEffect(() => {
@@ -262,9 +271,11 @@ data-bot-id="${site?.id}">
         <div className="
           max-w-[1500px]
           mx-auto
-          px-5
+          px-4
+          sm:px-6
           md:px-8
-          py-4
+          py-3.5
+          sm:py-4
           flex
           flex-col
           sm:flex-row
@@ -296,36 +307,61 @@ data-bot-id="${site?.id}">
           </div>
 
 
-          <button
-            onClick={saveBot}
-            disabled={saving}
-            className="
-              inline-flex
-              items-center
-              justify-center
-              gap-2
-              bg-blue-600
-              hover:bg-blue-700
-              disabled:opacity-60
-              text-white
-              px-5
-              py-3
-              rounded-xl
-              font-semibold
-              transition
-              shadow-lg
-              shadow-blue-600/20
-            "
-          >
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link
+              href={`/playground/${site.id}`}
+              className="
+                inline-flex
+                items-center
+                justify-center
+                gap-2
+                border
+                border-zinc-300
+                bg-white
+                hover:bg-zinc-50
+                text-zinc-700
+                px-4
+                py-2.5
+                rounded-xl
+                font-semibold
+                text-sm
+                transition
+                shadow-sm
+              "
+            >
+              <Sparkles size={16} className="text-blue-600" />
+              Playground
+            </Link>
 
-            <Save size={18} />
-
-            {saving
-              ? "Saving..."
-              : "Save Changes"
-            }
-
-          </button>
+            <button
+              onClick={saveBot}
+              disabled={saving}
+              className="
+                inline-flex
+                items-center
+                justify-center
+                gap-2
+                bg-blue-600
+                hover:bg-blue-700
+                disabled:opacity-60
+                text-white
+                px-5
+                py-2.5
+                rounded-xl
+                font-semibold
+                text-sm
+                transition
+                shadow-lg
+                shadow-blue-600/20
+              "
+            >
+              <Save size={17} />
+              {saving
+                ? "Saving..."
+                : "Save Changes"
+              }
+            </button>
+          </div>
 
         </div>
 
@@ -337,7 +373,8 @@ data-bot-id="${site?.id}">
       <div className="
         max-w-[1500px]
         mx-auto
-        p-5
+        p-4
+        sm:p-6
         md:p-8
       ">
 
@@ -454,7 +491,8 @@ data-bot-id="${site?.id}">
 
         <div className="
           grid
-          xl:grid-cols-[minmax(0,1fr)_430px]
+          xl:grid-cols-[minmax(0,1fr)_390px]
+          2xl:grid-cols-[minmax(0,1fr)_430px]
           gap-6
           items-start
         ">
@@ -773,7 +811,7 @@ data-bot-id="${site?.id}">
 
               <Field
                 label="Bot Logo"
-                help="Upload an image used in the launcher and chatbot header."
+                help="Upload an image used in the launcher and chatbot header (Max 5 MB)."
               >
 
                 <div className="
@@ -789,6 +827,7 @@ data-bot-id="${site?.id}">
                   gap-4
                 ">
 
+                  {/* Logo Preview Avatar */}
                   <div className="
                     w-16
                     h-16
@@ -801,102 +840,233 @@ data-bot-id="${site?.id}">
                     justify-center
                     overflow-hidden
                     shrink-0
+                    relative
                   ">
-
-                    {site.logo_url ? (
-
+                    {uploadingLogo ? (
+                      <Loader2
+                        size={24}
+                        className="text-blue-600 animate-spin"
+                      />
+                    ) : site.logo_url ? (
                       <img
                         src={site.logo_url}
                         alt="Bot logo"
+                        onError={() => {
+                          setSite((prev: any) => ({
+                            ...prev,
+                            logo_url: null,
+                          }));
+                        }}
                         className="
                           w-full
                           h-full
                           object-cover
                         "
                       />
-
                     ) : (
-
                       <Bot
                         size={25}
                         className="text-zinc-400"
                       />
-
                     )}
-
                   </div>
 
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    {/* Upload / Change Button */}
+                    <label className={`
+                      inline-flex
+                      items-center
+                      justify-center
+                      gap-2
+                      border
+                      border-zinc-300
+                      bg-white
+                      hover:bg-zinc-50
+                      px-4
+                      py-2.5
+                      rounded-lg
+                      text-sm
+                      font-medium
+                      transition
+                      ${uploadingLogo ? "opacity-60 cursor-not-allowed pointer-events-none" : "cursor-pointer"}
+                    `}>
+                      {uploadingLogo ? (
+                        <>
+                          <Loader2 size={17} className="animate-spin text-blue-600" />
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={17} />
+                          <span>{site.logo_url ? "Change Logo" : "Upload Logo"}</span>
+                        </>
+                      )}
 
-                  <label className="
-                    inline-flex
-                    items-center
-                    justify-center
-                    gap-2
-                    border
-                    border-zinc-300
-                    bg-white
-                    hover:bg-zinc-50
-                    px-4
-                    py-2.5
-                    rounded-lg
-                    cursor-pointer
-                    text-sm
-                    font-medium
-                  ">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={uploadingLogo}
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
 
-                    <Upload size={17} />
+                          // Reset input so selecting the same file later works
+                          const target = e.target;
 
-                    Upload Logo
+                          // Client-side validations
+                          if (!file.type || !file.type.startsWith("image/")) {
+                            alert("Please select a valid image file (PNG, JPG, WebP, SVG, etc.).");
+                            target.value = "";
+                            return;
+                          }
 
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={async (e) => {
+                          if (file.size > 5 * 1024 * 1024) {
+                            alert("File size exceeds 5 MB. Please select a smaller image.");
+                            target.value = "";
+                            return;
+                          }
 
-                        const file =
-                          e.target.files?.[0];
+                          setUploadingLogo(true);
+                          setLogoNotice(null);
 
-                        if (!file) return;
+                          try {
+                            const form = new FormData();
+                            form.append("file", file);
 
-                        const form =
-                          new FormData();
-
-                        form.append(
-                          "file",
-                          file
-                        );
-
-                        const res =
-                          await fetch(
-                            "/api/upload-logo",
-                            {
+                            const res = await fetch("/api/upload-logo", {
                               method: "POST",
                               body: form,
+                            });
+
+                            const data = await res.json();
+
+                            if (!data.success) {
+                              throw new Error(data.error || "Upload failed");
                             }
-                          );
 
-                        const data =
-                          await res.json();
-
-                        if (data.success) {
-
-                          setSite(
-                            (prev: any) => ({
+                            // 1. Update local state
+                            setSite((prev: any) => ({
                               ...prev,
-                              logo_url:
-                                data.url,
-                            })
-                          );
+                              logo_url: data.url,
+                            }));
 
-                        } else {
+                            // 2. Immediately persist to database so it isn't lost if user navigates
+                            const updatedQuestions = questionsText
+                              .split("\n")
+                              .map((q) => q.trim())
+                              .filter((q) => q !== "");
 
-                          alert(data.error);
-                        }
-                      }}
-                    />
+                            const updateRes = await fetch(`/api/websites/${params.id}`, {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                bot_name: site.bot_name,
+                                welcome_message: site.welcome_message,
+                                theme: site.theme || "light",
+                                suggested_questions: updatedQuestions,
+                                primary_color: site.primary_color || "#2563eb",
+                                header_color: site.header_color || "#2563eb",
+                                widget_position: site.widget_position || "right",
+                                widget_width: Number(site.widget_width) || 350,
+                                border_radius: Number(site.border_radius) || 12,
+                                logo_url: data.url,
+                                is_active: site.is_active === true,
+                              }),
+                            });
 
-                  </label>
+                            const updateData = await updateRes.json();
+                            if (!updateRes.ok || !updateData.success) {
+                              console.warn("Could not auto-save logo to database, please click Save Changes.");
+                            } else {
+                              setLogoNotice("Logo uploaded and saved successfully!");
+                              setTimeout(() => setLogoNotice(null), 4000);
+                            }
+                          } catch (err: any) {
+                            console.error("Upload logo error:", err);
+                            alert(err?.message || "Failed to upload image. Please try again.");
+                          } finally {
+                            target.value = "";
+                            setUploadingLogo(false);
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {/* Remove Logo Button */}
+                    {site.logo_url && (
+                      <button
+                        type="button"
+                        disabled={uploadingLogo}
+                        onClick={async () => {
+                          const ok = confirm("Are you sure you want to remove the bot logo?");
+                          if (!ok) return;
+
+                          setSite((prev: any) => ({
+                            ...prev,
+                            logo_url: null,
+                          }));
+
+                          try {
+                            const updatedQuestions = questionsText
+                              .split("\n")
+                              .map((q) => q.trim())
+                              .filter((q) => q !== "");
+
+                            await fetch(`/api/websites/${params.id}`, {
+                              method: "PUT",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                bot_name: site.bot_name,
+                                welcome_message: site.welcome_message,
+                                theme: site.theme || "light",
+                                suggested_questions: updatedQuestions,
+                                primary_color: site.primary_color || "#2563eb",
+                                header_color: site.header_color || "#2563eb",
+                                widget_position: site.widget_position || "right",
+                                widget_width: Number(site.widget_width) || 350,
+                                border_radius: Number(site.border_radius) || 12,
+                                logo_url: null,
+                                is_active: site.is_active === true,
+                              }),
+                            });
+
+                            setLogoNotice("Logo removed successfully.");
+                            setTimeout(() => setLogoNotice(null), 3000);
+                          } catch (err) {
+                            console.error("Error removing logo:", err);
+                          }
+                        }}
+                        className="
+                          inline-flex
+                          items-center
+                          justify-center
+                          gap-1.5
+                          border
+                          border-red-200
+                          bg-red-50
+                          hover:bg-red-100
+                          text-red-700
+                          px-3.5
+                          py-2.5
+                          rounded-lg
+                          text-sm
+                          font-medium
+                          transition
+                        "
+                      >
+                        <Trash2 size={15} />
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  {logoNotice && (
+                    <div className="w-full text-xs text-emerald-600 font-medium flex items-center gap-1.5 mt-1">
+                      <CheckCircle2 size={14} />
+                      {logoNotice}
+                    </div>
+                  )}
 
                 </div>
 
@@ -1338,7 +1508,8 @@ How can I contact support?`}
 
               <div className="
                 bg-zinc-100
-                p-4
+                p-2
+                sm:p-4
                 min-h-[640px]
                 overflow-hidden
               ">
@@ -1803,672 +1974,3 @@ function GuideStep({
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import {
-//   Globe,
-//   Bot,
-//   Database,
-//   MessageSquare,
-//   BarChart3,
-//   BookOpen,
-// } from "lucide-react";
-
-// import { useEffect, useState } from "react";
-// import { useParams } from "next/navigation";
-// import { supabaseClient } from "@/lib/supabaseClient";
-// import { useRouter } from "next/navigation";
-// import WidgetPreview from "@/components/WidgetPreview";
-
-// export default function WebsitePage() {
-//   const params = useParams();
-
-//   const [site, setSite] = useState<any>(null);
-//   const [loading, setLoading] = useState(true);
-//   const [questionsText, setQuestionsText] = useState("");
-//   const router = useRouter();
-
-// async function logout() {
-//   await supabaseClient.auth.signOut();
-//   router.push("/login");
-// }
-// <button
-//   onClick={logout}
-//   className="bg-red-600 text-white px-4 py-2 rounded-lg"
-// >
-//   Logout
-// </button>
-//   useEffect(() => {
-//     async function load() {
-//       const res = await fetch(`/api/websites/${params.id}`);
-//       const data = await res.json();
-//       console.log(data);
-
-//       if (data.success) {
-//   setSite(data.website);
-
-//   setQuestionsText(
-//     (data.website.suggested_questions || [])
-//       .join("\n")
-//   );
-// }
-//       setLoading(false);
-//     }
-
-//     load();
-//   }, [params.id]);
-
-//   async function saveBot() {
-//   const updatedSite = {
-//     ...site,
-
-//     suggested_questions: questionsText
-//       .split("\n")
-//       .map((question) => question.trim())
-//       .filter((question) => question !== ""),
-//   };
-
-//   const res = await fetch(
-//     `/api/websites/${params.id}`,
-//     {
-//       method: "PUT",
-
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-
-//       body: JSON.stringify(updatedSite),
-//     }
-//   );
-
-//   const data = await res.json();
-
-//   if (data.success) {
-//     setSite(updatedSite);
-
-//     alert("Bot updated successfully!");
-//   } else {
-//     alert(data.error);
-//   }
-// }
-
-//   const widgetScript =
-//   typeof window !== "undefined"
-//     ? `<script
-// src="${window.location.origin}/widget.js"
-// data-bot-id="${site?.id}">
-// </script>`
-//     : "";
-
-//   if (loading || !site) {
-//   return (
-//     <main className="min-h-screen flex items-center justify-center">
-//       <h2 className="text-2xl font-bold">
-//         Loading...
-//       </h2>
-//     </main>
-//   );
-// }
-
-//   return (
-// <div className="p-10">
-//       <div className="flex justify-between items-center mb-8">
-
-//   <div>
-
-//     <h1 className="text-4xl font-bold">
-//       {site.bot_name}
-//     </h1>
-
-//     <div className="flex gap-3 mt-3">
-
-//       <span
-//   className={`px-3 py-1 rounded-full text-sm ${
-//     site.is_active
-//       ? "bg-green-100 text-green-700"
-//       : "bg-red-100 text-red-700"
-//   }`}
-// >
-//   {site.is_active ? "🟢 Active" : "🔴 Paused"}
-// </span>
-
-//       <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
-//         {site.industry}
-//       </span>
-
-//       <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">
-//         {site.business_type}
-//       </span>
-
-//     </div>
-
-//     <p className="text-gray-500 mt-4 flex items-center gap-2">
-//       <Globe size={18} />
-//       {site.website_url}
-//     </p>
-
-//   </div>
-
-// </div>
-// <div className="grid md:grid-cols-4 gap-5 mb-8">
-
-//   <div className="bg-white rounded-xl shadow p-5">
-
-//     <Database className="mb-3" />
-
-//     <p className="text-gray-500">
-//       Products
-//     </p>
-
-//     <h2 className="text-3xl font-bold">
-//       {site.products?.length || 0}
-//     </h2>
-
-//   </div>
-
-//   <div className="bg-white rounded-xl shadow p-5">
-
-//     <BookOpen className="mb-3" />
-
-//     <p className="text-gray-500">
-//       Knowledge
-//     </p>
-
-//     <h2 className="text-3xl font-bold">
-//       Ready
-//     </h2>
-
-//   </div>
-
-//   <div className="bg-white rounded-xl shadow p-5">
-
-//     <MessageSquare className="mb-3" />
-
-//     <p className="text-gray-500">
-//       Chat
-//     </p>
-
-//     <h2 className="text-3xl font-bold">
-//       Enabled
-//     </h2>
-
-//   </div>
-
-//   <div className="bg-white rounded-xl shadow p-5">
-
-//     <Bot className="mb-3" />
-
-//     <p className="text-gray-500">
-//       Status
-//     </p>
-
-//     <h2
-//   className={`text-3xl font-bold ${
-//     site.is_active
-//       ? "text-green-600"
-//       : "text-red-600"
-//   }`}
-// >
-//   {site.is_active ? "Active" : "Paused"}
-// </h2>
-
-//   </div>
-
-// </div>
-
-
-//       <div className="bg-white rounded-xl shadow p-8 space-y-6">
-
-//         <div>
-//           <label className="font-semibold block mb-2">
-//             Website
-//           </label>
-
-//           <input
-//             value={site.website_url}
-//             disabled
-//             className="border p-3 rounded w-full bg-gray-100"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="font-semibold block mb-2">
-//             Industry
-//           </label>
-
-//           <input
-//             value={site.industry}
-//             disabled
-//             className="border p-3 rounded w-full bg-gray-100"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="font-semibold block mb-2">
-//             Business Type
-//           </label>
-
-//           <input
-//             value={site.business_type}
-//             disabled
-//             className="border p-3 rounded w-full bg-gray-100"
-//           />
-//         </div>
-
-//         <hr />
-
-//         <div>
-//           <label className="font-semibold block mb-2">
-//             Bot Name
-//           </label>
-
-//           <input
-//             value={site.bot_name}
-//             onChange={(e) =>
-//               setSite({
-//                 ...site,
-//                 bot_name: e.target.value,
-//               })
-//             }
-//             className="border p-3 rounded w-full"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="font-semibold block mb-2">
-//             Welcome Message
-//           </label>
-
-//           <textarea
-//             rows={4}
-//             value={site.welcome_message}
-//             onChange={(e) =>
-//               setSite({
-//                 ...site,
-//                 welcome_message: e.target.value,
-//               })
-//             }
-//             className="border p-3 rounded w-full"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="font-semibold block mb-2">
-//             Theme
-//           </label>
-
-//           <select
-//             value={site.theme}
-//             onChange={(e) =>
-//               setSite({
-//                 ...site,
-//                 theme: e.target.value,
-//               })
-//             }
-//             className="border p-3 rounded w-full"
-//           >
-//             <option value="dark">Dark</option>
-//             <option value="light">Light</option>
-//           </select>
-//         </div>
-
-//         <div>
-//   <label className="font-semibold block mb-2">
-//     Primary Color
-//   </label>
-
-//   <input
-//     type="color"
-//     value={site.primary_color || "#2563eb"}
-//     onChange={(e) =>
-//       setSite({
-//         ...site,
-//         primary_color: e.target.value,
-//       })
-//     }
-//     className="w-20 h-12"
-//   />
-// </div>
-
-// <div>
-//   <label className="font-semibold block mb-2">
-//     Header Color
-//   </label>
-
-//   <input
-//     type="color"
-//     value={site.header_color || "#2563eb"}
-//     onChange={(e) =>
-//       setSite({
-//         ...site,
-//         header_color: e.target.value,
-//       })
-//     }
-//     className="w-20 h-12"
-//   />
-// </div>
-
-// <div>
-//   <label className="font-semibold block mb-2">
-//     Widget Position
-//   </label>
-
-//   <select
-//     value={site.widget_position || "right"}
-//     onChange={(e) =>
-//       setSite({
-//         ...site,
-//         widget_position: e.target.value,
-//       })
-//     }
-//     className="border p-3 rounded w-full"
-//   >
-//     <option value="right">Right</option>
-//     <option value="left">Left</option>
-//   </select>
-// </div>
-
-// <div>
-//   <label className="font-semibold block mb-2">
-//     Widget Width
-//   </label>
-
-//   <input
-//     type="number"
-//     value={site.widget_width || 350}
-//     onChange={(e) =>
-//       setSite({
-//         ...site,
-//         widget_width: Number(e.target.value),
-//       })
-//     }
-//     className="border p-3 rounded w-full"
-//   />
-// </div>
-
-// <div>
-//   <label className="font-semibold block mb-2">
-//     Border Radius
-//   </label>
-
-//   <input
-//     type="number"
-//     value={site.border_radius || 12}
-//     onChange={(e) =>
-//       setSite({
-//         ...site,
-//         border_radius: Number(e.target.value),
-//       })
-//     }
-//     className="border p-3 rounded w-full"
-//   />
-// </div>
-
-//         <div>
-//           <div>
-//   <label className="font-semibold block mb-2">
-//     Bot Logo
-//   </label>
-
-//   {site.logo_url && (
-//     <img
-//       src={site.logo_url}
-//       alt="Logo"
-//       className="w-20 h-20 rounded-lg border mb-3 object-cover"
-//     />
-//   )}
-
-//   <input
-//     type="file"
-//     accept="image/*"
-//     onChange={async (e) => {
-//       const file = e.target.files?.[0];
-
-//       if (!file) return;
-
-//       const form = new FormData();
-
-//       form.append("file", file);
-
-//       const res = await fetch("/api/upload-logo", {
-//         method: "POST",
-//         body: form,
-//       });
-
-//       const data = await res.json();
-//       console.log("UPLOAD RESPONSE:", data);
-
-//       if (data.success) {
-//   console.log("Logo URL:", data.url);
-
-//   setSite((prev: any) => ({
-//     ...prev,
-//     logo_url: data.url,
-//   }));
-// } else {
-//   alert(data.error);
-// }
-//     }}
-//   />
-// </div>
-//           <label className="font-semibold block mb-2">
-//             Suggested Questions
-//           </label>
-
-//           <textarea
-//   rows={6}
-//   value={questionsText}
-//   onChange={(e) =>
-//     setQuestionsText(e.target.value)
-//   }
-//   placeholder={`Tell me about your products
-// What are your latest releases?
-// How can I contact support?`}
-//   className="border p-3 rounded w-full"
-// />
-//           <p className="text-sm text-gray-500 mt-2">
-//             Enter one question per line.
-//           </p>
-//         </div>
-//         <div className="border rounded-xl p-5 bg-gray-50">
-//   <div className="flex items-center justify-between">
-
-//     <div>
-//       <h3 className="font-semibold text-lg">
-//         Bot Status
-//       </h3>
-
-//       <p className="text-sm text-gray-500 mt-1">
-//         Pause the bot to temporarily disable the public chatbot widget.
-//       </p>
-//     </div>
-
-//     <button
-//       type="button"
-//       onClick={() =>
-//         setSite((prev: any) => ({
-//           ...prev,
-//           is_active: !prev.is_active,
-//         }))
-//       }
-//       className={`px-5 py-2.5 rounded-lg font-medium transition ${
-//         site.is_active
-//           ? "bg-green-600 hover:bg-green-700 text-white"
-//           : "bg-red-600 hover:bg-red-700 text-white"
-//       }`}
-//     >
-//       {site.is_active ? "Active" : "Paused"}
-//     </button>
-
-//   </div>
-// </div>
-//         <hr />
-
-// <WidgetPreview
-//   botName={site.bot_name}
-//   welcomeMessage={site.welcome_message}
-//   logoUrl={site.logo_url}
-//   theme={site.theme}
-//   primaryColor={site.primary_color || "#2563eb"}
-//   headerColor={site.header_color || "#2563eb"}
-//   widgetWidth={site.widget_width || 350}
-//   borderRadius={site.border_radius || 12}
-// />
-
-// <hr />
-
-//         <button
-//           onClick={saveBot}
-//           className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800"
-//         >
-//           Save Changes
-//         </button>
-
-//         <hr />
-
-// <div>
-
-//   <h2 className="text-2xl font-bold mb-5">
-//     Install Widget
-//   </h2>
-
-//   <div className="space-y-6">
-
-//     <div>
-//       <label className="font-semibold block mb-2">
-//         Bot ID
-//       </label>
-
-//       <div className="flex gap-3">
-
-//         <input
-//           readOnly
-//           value={site.id}
-//           className="border p-3 rounded w-full bg-gray-100 font-mono"
-//         />
-
-//         <button
-//           onClick={() => {
-//             navigator.clipboard.writeText(site.id);
-//             alert("Bot ID copied!");
-//           }}
-//           className="bg-black text-white px-5 rounded"
-//         >
-//           Copy
-//         </button>
-        
-//       </div>
-//     </div>
-
-//     <div>
-
-//       <label className="font-semibold block mb-2">
-//         Installation Script
-//       </label>
-
-//       <textarea
-//         readOnly
-//         value={widgetScript}
-//         rows={5}
-//         className="border p-3 rounded w-full bg-gray-100 font-mono"
-//       />
-
-//       <button
-//         onClick={() => {
-//           navigator.clipboard.writeText(widgetScript);
-//           alert("Script copied!");
-//         }}
-//         className="mt-3 bg-blue-600 text-white px-6 py-3 rounded-lg"
-//       >
-//         Copy Installation Script
-//       </button>
-//       <button
-//     onClick={() =>
-//       window.open("/test", "_blank")
-//     }
-//     className="bg-green-600 text-white px-6 py-3 rounded-lg"
-//   >
-//     Test Widget
-//   </button>
-
-//     </div>
-//     <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-
-//   <h3 className="text-xl font-bold mb-4">
-//     Installation Guide
-//   </h3>
-
-//   <ol className="list-decimal ml-6 space-y-3 text-gray-700">
-
-//     <li>
-//       Copy the installation script above.
-//     </li>
-
-//     <li>
-//       Paste it just before the closing
-//       {" "}
-//       <code>&lt;/body&gt;</code>
-//       {" "}
-//       tag of your website.
-//     </li>
-
-//     <li>
-//       Save and deploy your website.
-//     </li>
-
-//     <li>
-//       Refresh your website.
-//     </li>
-
-//     <li>
-//       Your AI chatbot will automatically appear.
-//     </li>
-
-//   </ol>
-
-// </div>
-
-//   </div>
-
-// </div>
-
-//         <hr />
-
-//         <div>
-//           <h2 className="text-2xl font-bold mb-4">
-//             Website Content
-//           </h2>
-
-//           <div className="border rounded-lg p-5 bg-gray-50 max-h-[500px] overflow-auto">
-//             <pre className="whitespace-pre-wrap">
-//               {site.website_content}
-//             </pre>
-//           </div>
-//         </div>
-
-//       </div>
-
-//     </div>
-//   );
-// }

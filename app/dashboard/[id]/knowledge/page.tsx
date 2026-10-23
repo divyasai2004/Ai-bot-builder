@@ -245,20 +245,20 @@ export default function KnowledgePage() {
     ).length;
 
   return (
-    <main className="min-h-screen p-6 md:p-10">
+    <main className="min-h-screen p-4 sm:p-6 md:p-8">
 
       {/* HEADER */}
 
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <p className="text-sm font-semibold uppercase tracking-wider text-blue-600">
           AI Knowledge
         </p>
 
-        <h1 className="mt-2 text-4xl font-bold text-zinc-900">
+        <h1 className="mt-1.5 sm:mt-2 text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-900">
           Knowledge Base
         </h1>
 
-        <p className="mt-3 max-w-2xl text-zinc-500">
+        <p className="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-zinc-500">
           Add information your AI assistant can use
           when answering visitor questions.
         </p>
@@ -266,7 +266,7 @@ export default function KnowledgePage() {
 
       {/* STATS */}
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mb-6 sm:mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
         <StatCard
           icon={
@@ -296,17 +296,17 @@ export default function KnowledgePage() {
 
       {/* UPLOAD CARD */}
 
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-sm">
 
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 sm:gap-6 sm:flex-row sm:items-center sm:justify-between">
 
           <div>
-            <h2 className="text-xl font-bold text-zinc-900">
+            <h2 className="text-lg sm:text-xl font-bold text-zinc-900">
               Add Knowledge
             </h2>
 
-            <p className="mt-2 text-sm text-zinc-500">
-              Upload TXT or DOCX documents.
+            <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-zinc-500">
+              Upload TXT, DOCX, or PDF documents.
               Maximum file size: 5 MB.
             </p>
           </div>
@@ -315,7 +315,7 @@ export default function KnowledgePage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".txt,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              accept=".txt,.docx,.pdf,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               onChange={uploadFile}
               disabled={uploading}
               className="hidden"
@@ -328,7 +328,7 @@ export default function KnowledgePage() {
               onClick={() =>
                 fileInputRef.current?.click()
               }
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 text-sm"
             >
               {uploading ? (
                 <>
@@ -476,8 +476,8 @@ export default function KnowledgePage() {
                             )}
                           </div>
 
-                          <div>
-                            <p className="font-medium text-zinc-900">
+                          <div className="min-w-0">
+                            <p className="font-medium text-zinc-900 break-all max-w-[140px] sm:max-w-xs md:max-w-md">
                               {isWebsite
                                 ? "Website Crawl"
                                 : file.fileName}

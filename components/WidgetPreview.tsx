@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { SendHorizontal, Bot, MessageCircle } from "lucide-react";
 
 interface WidgetPreviewProps {
@@ -28,6 +29,8 @@ export default function WidgetPreview({
   suggestedQuestions = [],
 }: WidgetPreviewProps) {
   const isDark = theme === "dark";
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const imageError = failedUrl === logoUrl;
 
   // Use real questions if available.
   // Otherwise show sample preview questions.
@@ -44,7 +47,7 @@ export default function WidgetPreview({
     <div className="w-full">
       {/* Preview Stage */}
 
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-100 to-zinc-200 p-6 md:p-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-100 to-zinc-200 p-3 sm:p-5">
         {/* Browser-style background decoration */}
 
         <div className="absolute left-6 top-5 flex gap-2 opacity-50">
@@ -76,10 +79,11 @@ export default function WidgetPreview({
                 background: `linear-gradient(135deg, ${headerColor}, ${primaryColor})`,
               }}
             >
-              {logoUrl ? (
+              {logoUrl && !imageError ? (
                 <img
                   src={logoUrl}
                   alt="Bot logo"
+                  onError={() => setFailedUrl(logoUrl || null)}
                   className="h-11 w-11 rounded-full bg-white object-cover ring-2 ring-white/30"
                 />
               ) : (

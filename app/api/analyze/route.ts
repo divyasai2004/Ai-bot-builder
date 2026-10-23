@@ -503,7 +503,7 @@ export async function POST(req: Request) {
     const chunks =
       chunkText(
         shortContent
-      );
+      ).slice(0, 10);
 
 
     console.log(

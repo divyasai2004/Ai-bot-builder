@@ -23,6 +23,8 @@ interface Website {
   bot_name: string;
   created_at: string;
   products?: string[];
+  logo_url?: string | null;
+  is_active?: boolean;
 }
 
 export default function Dashboard() {
@@ -34,6 +36,11 @@ export default function Dashboard() {
     async function load() {
       const res = await fetch("/api/websites");
       const data = await res.json();
+
+      if (!data.success && data.error === "Unauthorized") {
+        window.location.href = "/login";
+        return;
+      }
 
       if (data.success) {
         setWebsites(data.websites);
@@ -214,10 +221,20 @@ export default function Dashboard() {
                     </div>
 
                     <div className="mt-3.5 flex items-center gap-2">
-                      <div className="relative flex items-center justify-center h-8 w-8 shrink-0 rounded-lg bg-[#7C6CFF]/10 border border-[#7C6CFF]/20">
-                        <Bot size={15} className="text-[#9C93FF]" />
-                        <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-[#34D399]">
-                          <span className="absolute inset-0 rounded-full bg-[#34D399] animate-ping opacity-75" />
+                      <div className="relative flex items-center justify-center h-8 w-8 shrink-0 rounded-lg bg-[#7C6CFF]/10 border border-[#7C6CFF]/20 overflow-hidden">
+                        {site.logo_url ? (
+                          <img
+                            src={site.logo_url}
+                            alt={site.bot_name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <Bot size={15} className="text-[#9C93FF]" />
+                        )}
+                        <span className={`absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full ${site.is_active !== false ? "bg-[#34D399]" : "bg-amber-400"}`}>
+                          {site.is_active !== false && (
+                            <span className="absolute inset-0 rounded-full bg-[#34D399] animate-ping opacity-75" />
+                          )}
                         </span>
                       </div>
                       <span className="font-medium text-sm truncate">
@@ -226,9 +243,15 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <span className="shrink-0 bg-[#34D399]/10 text-[#34D399] text-xs font-medium px-2.5 py-1 rounded-full border border-[#34D399]/20">
-                    Active
-                  </span>
+                  {site.is_active !== false ? (
+                    <span className="shrink-0 bg-[#34D399]/10 text-[#34D399] text-xs font-medium px-2.5 py-1 rounded-full border border-[#34D399]/20">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="shrink-0 bg-amber-400/10 text-amber-400 text-xs font-medium px-2.5 py-1 rounded-full border border-amber-400/20">
+                      Paused
+                    </span>
+                  )}
                 </div>
 
                 {/* Info */}
@@ -264,12 +287,12 @@ export default function Dashboard() {
                       <ArrowUpRight size={13} />
                     </Link>
                     <Link
-  href={`/playground/${site.id}`}
-  className="inline-flex items-center gap-1.5 bg-[#7C6CFF]/10 text-[#9C93FF] border border-[#7C6CFF]/20 px-3.5 py-2 rounded-lg text-xs font-medium hover:bg-[#7C6CFF]/20 transition-colors"
->
-  <MessageSquare size={14} />
-  Playground
-</Link>
+                      href={`/playground/${site.id}`}
+                      className="inline-flex items-center gap-1.5 bg-[#7C6CFF]/10 text-[#9C93FF] border border-[#7C6CFF]/20 px-3.5 py-2 rounded-lg text-xs font-medium hover:bg-[#7C6CFF]/20 transition-colors"
+                    >
+                      <MessageSquare size={14} />
+                      Playground
+                    </Link>
 
                     <button
                       onClick={() => deleteBot(site.id)}
@@ -329,276 +352,3 @@ function StatCard({
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import Link from "next/link";
-// import { Plus, Search, Trash2, Globe, Bot } from "lucide-react";
-
-// interface Website {
-//   id: string;
-//   website_url: string;
-//   industry: string;
-//   business_type: string;
-//   bot_name: string;
-//   created_at: string;
-//   products?: string[];
-// }
-
-// export default function Dashboard() {
-// const [websites, setWebsites] = useState<Website[]>([]);
-// const [search, setSearch] = useState("");
-// const [loading, setLoading] = useState(true);
-//   useEffect(() => {
-//     async function load() {
-//       const res = await fetch("/api/websites");
-//       const data = await res.json();
-
-//       if (data.success) {
-//     setWebsites(data.websites);
-// }
-
-// setLoading(false);
-//     }
-
-//     load();
-//   }, []);
-
-//   const filtered = websites.filter((site) =>
-//   site.website_url
-//     .toLowerCase()
-//     .includes(search.toLowerCase())
-// );
-// async function deleteBot(id: string) {
-//   const ok = confirm("Delete this bot?");
-
-//   if (!ok) return;
-
-//   const res = await fetch(`/api/websites/${id}`, {
-//     method: "DELETE",
-//   });
-
-//   const data = await res.json();
-
-//   if (data.success) {
-//     setWebsites((prev) =>
-//       prev.filter((w) => w.id !== id)
-//     );
-//   } else {
-//     alert(data.error);
-//   }
-// }
-
-//   return (
-    
-//    <main className="min-h-screen bg-gray-100 p-10">
-
-// <div className="flex justify-between items-center mb-8">
-
-// <div>
-// <h1 className="text-4xl font-bold">
-// Dashboard
-// </h1>
-
-// <p className="text-gray-600 mt-2">
-// Manage your AI bots
-// </p>
-// </div>
-
-// <Link
-// href="/create"
-// className="bg-black text-white px-5 py-3 rounded-lg flex items-center gap-2"
-// >
-// <Plus size={18}/>
-// New Bot
-// </Link>
-
-// </div>
-// <div className="grid grid-cols-3 gap-5 mb-8">
-
-// <div className="bg-white rounded-xl shadow p-5">
-// <p className="text-gray-500">
-// Bots
-// </p>
-
-// <h2 className="text-3xl font-bold">
-// {websites.length}
-// </h2>
-// </div>
-
-// <div className="bg-white rounded-xl shadow p-5">
-// <p className="text-gray-500">
-// Products
-// </p>
-
-// <h2 className="text-3xl font-bold">
-// {websites.reduce(
-// (a, b) => a + (b.products?.length || 0),
-// 0
-// )}
-// </h2>
-// </div>
-
-// <div className="bg-white rounded-xl shadow p-5">
-// <p className="text-gray-500">
-// Industries
-// </p>
-
-// <h2 className="text-3xl font-bold">
-// {
-// new Set(websites.map(w=>w.industry)).size
-// }
-// </h2>
-// </div>
-
-// </div>
-// <div className="relative mb-8">
-
-// <Search
-// size={18}
-// className="absolute left-4 top-3.5 text-gray-500"
-// />
-
-// <input
-// value={search}
-// onChange={(e)=>setSearch(e.target.value)}
-// placeholder="Search websites..."
-// className="pl-10 w-full p-3 rounded-lg border bg-white"
-// />
-
-// </div>
-
-//       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-
-//   {filtered.map((site) => (
-
-//     <div
-//       key={site.id}
-//       className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border"
-//     >
-
-//       {/* Header */}
-
-//       <div className="flex justify-between items-start">
-
-//         <div>
-
-//           <div className="flex items-center gap-2">
-
-//             <Globe
-//               size={18}
-//               className="text-blue-600"
-//             />
-
-//             <h2 className="font-bold text-lg break-all">
-//               {site.website_url}
-//             </h2>
-
-//           </div>
-
-//           <div className="mt-3 flex items-center gap-2">
-
-//             <Bot
-//               size={18}
-//               className="text-green-600"
-//             />
-
-//             <span className="font-medium">
-//               {site.bot_name}
-//             </span>
-
-//           </div>
-
-//         </div>
-
-//         <span className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
-//           Active
-//         </span>
-
-//       </div>
-
-//       {/* Info */}
-
-//       <div className="mt-6 space-y-2 text-sm">
-
-//         <p>
-
-//           <span className="font-semibold">
-//             Industry:
-//           </span>{" "}
-//           {site.industry}
-
-//         </p>
-
-//         <p>
-
-//           <span className="font-semibold">
-//             Business:
-//           </span>{" "}
-//           {site.business_type}
-
-//         </p>
-
-//         <p>
-
-//           <span className="font-semibold">
-//             Products:
-//           </span>{" "}
-//           {site.products?.length || 0}
-
-//         </p>
-
-//       </div>
-
-//       {/* Footer */}
-
-//       <div className="mt-6 flex justify-between items-center">
-
-//         <span className="text-gray-500 text-sm">
-
-//           {new Date(site.created_at).toLocaleDateString()}
-
-//         </span>
-
-//         <div className="flex gap-2">
-
-//           <Link
-//             href={`/dashboard/${site.id}`}
-//             className="bg-black text-white px-4 py-2 rounded-lg text-sm"
-//           >
-//             Details
-//           </Link>
-
-//           <button
-//             onClick={() => deleteBot(site.id)}
-//             className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg"
-//           >
-//             <Trash2 size={18}/>
-//           </button>
-
-//         </div>
-
-//       </div>
-
-//     </div>
-
-//   ))}
-
-// </div>
-
-//     </main>
-    
-//   );
-  
-// }

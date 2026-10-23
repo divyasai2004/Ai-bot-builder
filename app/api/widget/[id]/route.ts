@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "*",
@@ -18,6 +19,9 @@ export async function GET(
       .from("websites")
       .select(`
         id,
+        website_url,
+        industry,
+        business_type,
         bot_name,
         welcome_message,
         theme,
@@ -48,7 +52,38 @@ export async function GET(
       );
     }
 
-    if (!data.is_active) {
+    const url = new URL(req.url);
+    const isPreview = url.searchParams.get("preview") === "true";
+
+    if (isPreview) {
+      const supabase = await createSupabaseServerClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        return new NextResponse(
+          JSON.stringify({ success: false, error: "Unauthorized preview request." }),
+          { status: 401, headers: corsHeaders }
+        );
+      }
+
+      const { data: ownedBot } = await supabaseAdmin
+        .from("websites")
+        .select("id")
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!ownedBot) {
+        return new NextResponse(
+          JSON.stringify({ success: false, error: "Bot not found or access denied." }),
+          { status: 404, headers: corsHeaders }
+        );
+      }
+    }
+
+    if (!data.is_active && !isPreview) {
       return new NextResponse(
         JSON.stringify({
           success: false,
@@ -66,6 +101,7 @@ export async function GET(
       JSON.stringify({
         success: true,
         config: data,
+        paused: !data.is_active,
       }),
       {
         status: 200,

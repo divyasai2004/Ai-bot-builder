@@ -13,7 +13,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  async function signIn() {
+  async function signIn(e?: React.FormEvent) {
+    if (e) e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      alert("Please enter both email and password.");
+      return;
+    }
     setLoading(true);
 
     const { error } =
@@ -48,10 +53,9 @@ export default function LoginPage() {
       />
 
       <div className="relative w-full max-w-[400px]">
-        <div className="rounded-2xl border border-red-900/40 bg-white/[0.04] p-8 shadow-2xl shadow-black/60 backdrop-blur-xl">
+        <div className="rounded-2xl border border-red-900/40 bg-white/[0.04] p-6 sm:p-8 shadow-2xl shadow-black/60 backdrop-blur-xl">
           {/* Header */}
           <div className="mb-8 text-center">
-          
             <h1 className="text-2xl font-semibold tracking-tight text-white">
               AI Bot Builder
             </h1>
@@ -61,7 +65,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <div className="space-y-4">
+          <form onSubmit={signIn} className="space-y-4">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/70">
                 Email
@@ -81,6 +85,8 @@ export default function LoginPage() {
                   />
                 </svg>
                 <input
+                  type="email"
+                  required
                   placeholder="you@example.com"
                   className="w-full rounded-lg border border-white/10 bg-white/[0.03] py-2.5 pl-10 pr-3.5 text-sm text-white placeholder-white/30 outline-none transition-colors focus:border-red-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-red-500/20"
                   value={email}
@@ -108,8 +114,9 @@ export default function LoginPage() {
                   />
                 </svg>
                 <input
-                  placeholder="••••••••"
                   type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="••••••••"
                   className="w-full rounded-lg border border-white/10 bg-white/[0.03] py-2.5 pl-10 pr-11 text-sm text-white placeholder-white/30 outline-none transition-colors focus:border-red-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-red-500/20"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -118,6 +125,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 transition-colors hover:text-white/80"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
@@ -125,7 +133,7 @@ export default function LoginPage() {
             </div>
 
             <button
-              onClick={signIn}
+              type="submit"
               disabled={loading}
               className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-red-800 py-2.5 text-sm font-medium text-white shadow-lg shadow-red-700/30 transition-all hover:shadow-red-600/50 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:brightness-100"
             >
@@ -154,140 +162,15 @@ export default function LoginPage() {
             </button>
 
             <button
+              type="button"
               onClick={() => router.push("/signup")}
               className="w-full rounded-lg border border-white/15 py-2.5 text-sm font-medium text-white/90 transition-colors hover:border-red-500/50 hover:bg-white/[0.03]"
             >
               Create account
             </button>
-          </div>
+          </form>
         </div>
       </div>
     </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import { useState } from "react";
-// import { supabaseClient } from "@/lib/supabaseClient";
-// import { useRouter } from "next/navigation";
-// import { Eye, EyeOff } from "lucide-react";
-// export default function LoginPage() {
-//   const router = useRouter();
-
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-// const [showPassword, setShowPassword] = useState(false);
-//   const [loading, setLoading] = useState(false);
-
-//   async function signUp() {
-//     setLoading(true);
-
-//     const { error } = await supabaseClient.auth.signUp({
-//       email,
-//       password,
-//     });
-
-//     setLoading(false);
-
-//     if (error) {
-//       alert(error.message);
-//       return;
-//     }
-
-//     alert("Account created! Please verify your email.");
-//   }
-
-//   async function signIn() {
-//     setLoading(true);
-
-//     const { error } =
-//       await supabaseClient.auth.signInWithPassword({
-//         email,
-//         password,
-//       });
-
-//     setLoading(false);
-
-//     if (error) {
-//       alert(error.message);
-//       return;
-//     }
-
-//     router.refresh();
-//     router.push("/dashboard");
-//   }
-
-//   return (
-//     <main className="min-h-screen flex items-center justify-center bg-zinc-950">
-
-//       <div className="bg-zinc-900 p-8 rounded-xl w-[400px]">
-
-//         <h1 className="text-3xl text-white font-bold mb-6">
-//           AI Bot Builder
-//         </h1>
-
-//         <input
-//           placeholder="Email"
-//           className="w-full p-3 rounded bg-zinc-800 text-white mb-4"
-//           value={email}
-//           onChange={(e)=>setEmail(e.target.value)}
-//         />
-
-//         <div className="relative mb-6">
-//   <input
-//     placeholder="Password"
-//     type={showPassword ? "text" : "password"}
-//     className="w-full p-3 pr-12 rounded bg-zinc-800 text-white"
-//     value={password}
-//     onChange={(e) => setPassword(e.target.value)}
-//   />
-
-//   <button
-//     type="button"
-//     onClick={() => setShowPassword(!showPassword)}
-//     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-//   >
-//     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-//   </button>
-// </div>
-
-//         <button
-//           onClick={signIn}
-//           className="w-full bg-blue-600 text-white py-3 rounded mb-3"
-//         >
-//           {loading ? "Loading..." : "Login"}
-//         </button>
-
-//         <button
-//           onClick={signUp}
-//           className="w-full border border-zinc-600 text-white py-3 rounded"
-//         >
-//           Create Account
-//         </button>
-
-//       </div>
-
-//     </main>
-//   );
-// }

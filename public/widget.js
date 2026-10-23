@@ -254,6 +254,11 @@ if (!conversationId) {
   pointerEvents: "none",
 });
 
+    logo.onerror = function () {
+      logo.remove();
+      button.textContent = "🤖";
+    };
+
     button.appendChild(logo);
   } else {
     button.textContent = "🤖";
@@ -394,6 +399,7 @@ background:
             <img
               src="${escapeHTML(bot.logo_url)}"
               alt="Bot Logo"
+              onerror="this.style.display='none'"
               style="
                 width: 40px;
                 height: 40px;

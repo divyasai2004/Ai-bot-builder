@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 import { supabaseClient } from "../../lib/supabaseClient";
 
 export default function SignupPage() {
@@ -10,10 +11,15 @@ export default function SignupPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  async function signup() {
+  async function signup(e?: React.FormEvent) {
+    if (e) e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      alert("Please enter both email and password.");
+      return;
+    }
     setLoading(true);
 
     const { error } = await supabaseClient.auth.signUp({
@@ -29,7 +35,6 @@ export default function SignupPage() {
     }
 
     alert("Account created successfully!");
-
     router.push("/login");
   }
 
@@ -48,7 +53,7 @@ export default function SignupPage() {
       />
 
       <div className="relative w-full max-w-[400px]">
-        <div className="rounded-2xl border border-red-900/40 bg-white/[0.04] p-8 shadow-2xl shadow-black/60 backdrop-blur-xl">
+        <div className="rounded-2xl border border-red-900/40 bg-white/[0.04] p-6 sm:p-8 shadow-2xl shadow-black/60 backdrop-blur-xl">
           {/* Header */}
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-semibold tracking-tight text-white">
@@ -60,7 +65,7 @@ export default function SignupPage() {
           </div>
 
           {/* Form */}
-          <div className="space-y-4">
+          <form onSubmit={signup} className="space-y-4">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/70">
                 Email
@@ -81,6 +86,7 @@ export default function SignupPage() {
                 </svg>
                 <input
                   type="email"
+                  required
                   placeholder="you@example.com"
                   className="w-full rounded-lg border border-white/10 bg-white/[0.03] py-2.5 pl-10 pr-3.5 text-sm text-white placeholder-white/30 outline-none transition-colors focus:border-red-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-red-500/20"
                   value={email}
@@ -108,17 +114,26 @@ export default function SignupPage() {
                   />
                 </svg>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
+                  required
                   placeholder="••••••••"
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.03] py-2.5 pl-10 pr-3.5 text-sm text-white placeholder-white/30 outline-none transition-colors focus:border-red-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-red-500/20"
+                  className="w-full rounded-lg border border-white/10 bg-white/[0.03] py-2.5 pl-10 pr-11 text-sm text-white placeholder-white/30 outline-none transition-colors focus:border-red-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-red-500/20"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 transition-colors hover:text-white/80"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
               </div>
             </div>
 
             <button
-              onClick={signup}
+              type="submit"
               disabled={loading}
               className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-red-800 py-2.5 text-sm font-medium text-white shadow-lg shadow-red-700/30 transition-all hover:shadow-red-600/50 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:brightness-100"
             >
@@ -145,7 +160,7 @@ export default function SignupPage() {
               )}
               {loading ? "Creating account..." : "Create account"}
             </button>
-          </div>
+          </form>
 
           <p className="mt-6 text-center text-sm text-white/50">
             Already have an account?{" "}
@@ -161,84 +176,3 @@ export default function SignupPage() {
     </main>
   );
 }
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import { useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { supabaseClient } from "../../lib/supabaseClient";
-
-// export default function SignupPage() {
-//   const router = useRouter();
-
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-
-//   const [loading, setLoading] = useState(false);
-
-//   async function signup() {
-//     setLoading(true);
-
-//     const { error } = await supabaseClient.auth.signUp({
-//       email,
-//       password,
-//     });
-
-//     setLoading(false);
-
-//     if (error) {
-//       alert(error.message);
-//       return;
-//     }
-
-//     alert("Account created successfully!");
-
-//     router.push("/login");
-//   }
-
-//   return (
-//     <main className="min-h-screen flex justify-center items-center bg-gray-100">
-
-//       <div className="bg-white shadow-xl rounded-xl p-8 w-[400px]">
-
-//         <h1 className="text-3xl font-bold mb-6">
-//           Create Account
-//         </h1>
-
-//         <input
-//           type="email"
-//           placeholder="Email"
-//           className="border p-3 rounded w-full mb-4"
-//           value={email}
-//           onChange={(e) => setEmail(e.target.value)}
-//         />
-
-//         <input
-//           type="password"
-//           placeholder="Password"
-//           className="border p-3 rounded w-full mb-6"
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//         />
-
-//         <button
-//           onClick={signup}
-//           disabled={loading}
-//           className="bg-blue-600 text-white w-full py-3 rounded-lg"
-//         >
-//           {loading ? "Creating..." : "Create Account"}
-//         </button>
-
-//       </div>
-
-//     </main>
-//   );
-// }

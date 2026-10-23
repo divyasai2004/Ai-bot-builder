@@ -72,16 +72,22 @@ export async function saveChunks(
       `Generating embedding ${i + 1}/${chunks.length}`
     );
 
-    const embedding =
+    let embedding =
       await generateEmbedding(chunk);
 
-    if (
-      !embedding ||
-      embedding.length === 0
-    ) {
-      throw new Error(
-        `Embedding generation failed for chunk ${i + 1}.`
+    if (!embedding || embedding.length === 0) {
+      console.warn(
+        `Embedding failed for chunk ${i + 1}, retrying after backoff...`
       );
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      embedding = await generateEmbedding(chunk);
+    }
+
+    if (!embedding || embedding.length === 0) {
+      console.warn(
+        `Skipping chunk ${i + 1} after retry failure.`
+      );
+      continue;
     }
 
     preparedChunks.push({
@@ -108,7 +114,7 @@ export async function saveChunks(
     preparedChunks.length === 0
   ) {
     throw new Error(
-      "No valid chunks could be prepared."
+      "No valid embeddings could be generated for the chunks."
     );
   }
 

@@ -5,34 +5,98 @@ import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabaseClient";
 import {
   Bot,
-  BrainCircuit,
   Globe,
-  MessageSquare,
-  ArrowRight,
-  Database,
   Sparkles,
-  ScanLine,
+  ArrowRight,
+  Search,
+  Zap,
+  ShieldCheck,
+  Code2,
+  BrainCircuit,
+  Database,
+  Sliders,
+  BarChart3,
+  Check,
+  Copy,
+  ChevronDown,
+  RefreshCw,
+  Send,
+  Terminal,
   Layers,
+  Lock,
+  ExternalLink,
+  MessageSquare,
+  Activity,
 } from "lucide-react";
+import Link from "next/link";
 
-function EmberSmokeBackground() {
+/* =========================================================
+   AMBIENT COSMIC BACKGROUND & GLOW EFFECTS
+========================================================= */
+function AmbientCosmicBackground() {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-[#0B0E14]"
+      className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-[#07080D]"
     >
-      <div className="smoke-blob blob-a" />
-      <div className="smoke-blob blob-b" />
-      <div className="smoke-blob blob-c" />
-      <div className="smoke-blob blob-d" />
-      <div className="absolute inset-0 bg-[#0B0E14]/40" />
-      <div className="absolute inset-0 vignette" />
+      {/* Primary Top Violet Aurora Bloom */}
+      <div
+        className="absolute -top-48 left-1/2 -translate-x-1/2 w-[1100px] h-[650px] rounded-full opacity-30 blur-[150px] animate-pulse-glow"
+        style={{
+          background:
+            "radial-gradient(circle, #7C6CFF 0%, rgba(34, 211, 200, 0.2) 45%, transparent 70%)",
+        }}
+      />
+
+      {/* Left Warm Amber/Coral Bloom */}
+      <div
+        className="absolute top-[28%] -left-48 w-[650px] h-[650px] rounded-full opacity-15 blur-[160px]"
+        style={{
+          background: "radial-gradient(circle, #FF6B4A 0%, transparent 70%)",
+        }}
+      />
+
+      {/* Right Cyber Cyan Bloom */}
+      <div
+        className="absolute top-[52%] -right-48 w-[700px] h-[700px] rounded-full opacity-15 blur-[160px]"
+        style={{
+          background: "radial-gradient(circle, #06B6D4 0%, transparent 70%)",
+        }}
+      />
+
+      {/* Bottom Center Violet Anchor Bloom */}
+      <div
+        className="absolute bottom-[-100px] left-1/2 -translate-x-1/2 w-[850px] h-[450px] rounded-full opacity-20 blur-[140px]"
+        style={{
+          background: "radial-gradient(circle, #7C6CFF 0%, transparent 75%)",
+        }}
+      />
+
+      {/* High-Tech Geometric Dot Matrix Overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.035]"
+        style={{
+          backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+        }}
+      />
+
+      {/* Subtle Radial Vignette for Depth */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(7,8,13,0.92)_100%)]" />
     </div>
   );
 }
 
-function BotGreeting() {
-  const phrases = ["hie", "hello world", "need help?", "ask me anything"];
+/* =========================================================
+   FLOATING INTERACTIVE MASCOT WITH TYPING SPEECH BUBBLE
+========================================================= */
+function FloatingBotMascot() {
+  const phrases = [
+    "Ask me anything about your site",
+    "Sub-300ms Groq streaming response",
+    "Zero hallucinations • 100% grounded",
+    "Embed anywhere with 1 line of code",
+  ];
 
   const [text, setText] = useState("");
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -40,26 +104,20 @@ function BotGreeting() {
 
   useEffect(() => {
     const current = phrases[phraseIndex % phrases.length];
-    let delay = deleting ? 45 : 90;
+    const delay = deleting ? 35 : 75;
 
     if (!deleting && text === current) {
-      delay = 1400;
-    } else if (deleting && text === "") {
-      delay = 350;
+      const holdTimeout = setTimeout(() => setDeleting(true), 2200);
+      return () => clearTimeout(holdTimeout);
+    }
+
+    if (deleting && text === "") {
+      setDeleting(false);
+      setPhraseIndex((prev) => (prev + 1) % phrases.length);
+      return;
     }
 
     const timeout = setTimeout(() => {
-      if (!deleting && text === current) {
-        setDeleting(true);
-        return;
-      }
-
-      if (deleting && text === "") {
-        setDeleting(false);
-        setPhraseIndex((i) => (i + 1) % phrases.length);
-        return;
-      }
-
       setText((t) =>
         deleting
           ? current.slice(0, t.length - 1)
@@ -71,86 +129,541 @@ function BotGreeting() {
   }, [text, deleting, phraseIndex]);
 
   return (
-    <div className="pointer-events-none fixed bottom-10 right-6 sm:bottom-14 sm:right-14 z-20">
-      <div className="bot-float relative w-[130px] sm:w-[170px] md:w-[210px]">
-        <div className="speech-bubble absolute -top-16 sm:-top-20 left-1/2 -translate-x-1/2 min-w-[110px] bg-[#12161F] border border-[#232838] rounded-xl rounded-bl-sm px-4 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
-          <span className="font-mono text-sm sm:text-base text-[#5EEAD4] whitespace-nowrap">
-            {text}
-            <span className="type-cursor">|</span>
-          </span>
+    <div className="hidden lg:block pointer-events-none fixed bottom-7 right-7 z-30 animate-float-slow">
+      <div className="relative group">
+        {/* Speech bubble */}
+        <div className="absolute -top-14 right-2 min-w-[220px] bg-[#121522]/95 backdrop-blur-xl border border-white/15 rounded-2xl rounded-br-sm px-4 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[#5EEAD4] animate-ping" />
+            <p className="font-mono text-xs text-[#5EEAD4] whitespace-nowrap">
+              {text}
+              <span className="inline-block w-1.5 h-3.5 bg-[#5EEAD4] ml-0.5 align-middle animate-pulse" />
+            </p>
+          </div>
         </div>
 
-        <svg
-          viewBox="0 0 120 120"
-          className="w-full h-auto "
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect x="18" y="4" width="6" height="16" rx="3" fill="#3a4257" />
-          <circle cx="21" cy="4" r="5" fill="#d63333" />
-
-          <rect
-            x="12"
-            y="20"
-            width="96"
-            height="80"
-            rx="22"
-            fill="#12161F"
-            stroke="#26242416"
-            strokeWidth="2.5"
-          />
-
-          <rect
-            x="26"
-            y="40"
-            width="68"
-            height="42"
-            rx="14"
-            fill="#0B0E14"
-          />
-
-          <circle className="bot-eye" cx="48" cy="61" r="7" fill="#5EEAD4" />
-          <circle className="bot-eye" cx="72" cy="61" r="7" fill="#5EEAD4" />
-
-          <path
-            d="M50 92 Q60 100 70 92"
-            stroke="#5EEAD4"
-            strokeWidth="3"
-            strokeLinecap="round"
-            fill="none"
-          />
-
-          <rect
-            x="0"
-            y="52"
-            width="10"
-            height="20"
-            rx="5"
-            fill="#12161F"
-            stroke="#232838"
-            strokeWidth="2"
-          />
-          <rect
-            x="110"
-            y="52"
-            width="10"
-            height="20"
-            rx="5"
-            fill="#12161F"
-            stroke="#232838"
-            strokeWidth="2"
-          />
-        </svg>
+        {/* Mascot Avatar Card */}
+        <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-[#121626] to-[#1C2238] border border-white/20 p-2 shadow-2xl flex items-center justify-center">
+          <div className="h-full w-full rounded-xl bg-gradient-to-br from-[#7C6CFF]/30 to-[#5EEAD4]/30 border border-white/10 flex items-center justify-center text-[#5EEAD4]">
+            <Bot size={28} strokeWidth={2.2} />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
+/* =========================================================
+   INTERACTIVE SIMULATED CHATBOT SANDBOX COMPONENT (HERO)
+========================================================= */
+interface ChatMessage {
+  id: string;
+  sender: "user" | "bot";
+  text: string;
+  source?: string;
+  latency?: string;
+}
+
+const PRESET_CONVERSATIONS: Record<
+  string,
+  { answer: string; source: string; latency: string }
+> = {
+  pricing: {
+    answer:
+      "We provide two simple plans: Free tier includes 1 bot and 50 conversations. Pro tier unlocks unlimited bots, custom branding, multi-page indexing, and full API access for $29/mo.",
+    source: "https://your-store.com/pricing",
+    latency: "260ms",
+  },
+  rag: {
+    answer:
+      "Our autonomous pipeline scrapes your website, converts HTML into semantic chunks, and stores 768-D vectors in Supabase pgvector. Groq LLM streams answers strictly grounded in these facts.",
+    source: "https://your-store.com/docs/architecture",
+    latency: "285ms",
+  },
+  customization: {
+    answer:
+      "Yes! Customize primary colors, header styles, welcome greetings, bot avatar logos, and chat bubble roundedness from Bot Settings in real time.",
+    source: "https://your-store.com/docs/styling",
+    latency: "310ms",
+  },
+  embed: {
+    answer:
+      "Embedding takes 10 seconds: paste our `<script src='.../embed.js' data-bot-id='...'></script>` right before your `</body>` tag on Webflow, WordPress, Shopify, or React.",
+    source: "https://your-store.com/docs/embed",
+    latency: "240ms",
+  },
+};
+
+function HeroInteractiveSimulator() {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: "1",
+      sender: "bot",
+      text: "Hi there! I am your AI assistant grounded strictly in your website data. How can I help you today?",
+    },
+    {
+      id: "2",
+      sender: "user",
+      text: "What features are included in the Pro tier?",
+    },
+    {
+      id: "3",
+      sender: "bot",
+      text: "The Pro tier includes unlimited bot queries, custom branding, multi-page crawling, priority support, and complete analytics export.",
+      source: "https://your-store.com/pricing",
+      latency: "275ms",
+    },
+  ]);
+  const [inputValue, setInputValue] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  function handleSend(promptText?: string) {
+    const textToSend = (promptText || inputValue).trim();
+    if (!textToSend || isTyping) return;
+
+    const userMsgId = Date.now().toString();
+    const newUserMsg: ChatMessage = {
+      id: userMsgId,
+      sender: "user",
+      text: textToSend,
+    };
+
+    setMessages((prev) => [...prev, newUserMsg]);
+    setInputValue("");
+    setIsTyping(true);
+
+    // Determine smart matching preset or default fallback
+    let matchKey = "pricing";
+    const lower = textToSend.toLowerCase();
+    if (lower.includes("rag") || lower.includes("how") || lower.includes("work")) {
+      matchKey = "rag";
+    } else if (lower.includes("color") || lower.includes("custom") || lower.includes("style")) {
+      matchKey = "customization";
+    } else if (lower.includes("embed") || lower.includes("install") || lower.includes("script")) {
+      matchKey = "embed";
+    }
+
+    const matched = PRESET_CONVERSATIONS[matchKey];
+
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          sender: "bot",
+          text: matched.answer,
+          source: matched.source,
+          latency: matched.latency,
+        },
+      ]);
+      setIsTyping(false);
+    }, 700);
+  }
+
+  function handleReset() {
+    setMessages([
+      {
+        id: "1",
+        sender: "bot",
+        text: "Hi there! I am your AI assistant grounded strictly in your website data. How can I help you today?",
+      },
+    ]);
+  }
+
+  return (
+    <div className="relative">
+      {/* Outer ambient glow */}
+      <div className="absolute -inset-4 bg-gradient-to-r from-[#7C6CFF]/25 via-[#22D3C8]/15 to-[#FF6B4A]/20 rounded-3xl blur-2xl -z-10" />
+
+      {/* Main Glassmorphic Container Frame */}
+      <div className="bg-[#111422]/90 border border-white/15 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur-2xl">
+        {/* macOS Browser Header */}
+        <div className="bg-[#0C0F1A] px-4 py-3 border-b border-white/[0.08] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
+          </div>
+
+          <div className="bg-black/50 border border-white/[0.08] rounded-lg px-3 py-1 flex items-center gap-2 text-xs font-mono text-[#8B91A4] max-w-[240px] truncate">
+            <Lock size={11} className="text-emerald-400 shrink-0" />
+            <span className="truncate">https://your-store.com/assistant</span>
+          </div>
+
+          <button
+            onClick={handleReset}
+            title="Reset sandbox demo"
+            className="text-[#6C7286] hover:text-white p-1 rounded-md hover:bg-white/10 transition-colors"
+          >
+            <RefreshCw size={13} />
+          </button>
+        </div>
+
+        {/* Dual Sub-sections: Live Crawler Telemetry + Active Interactive Chat */}
+        <div className="p-4 sm:p-5 space-y-4 bg-gradient-to-b from-[#111422] to-[#0A0D17]">
+          {/* Top: Simulated Scraper Telemetry Bar */}
+          <div className="relative border border-white/[0.08] bg-white/[0.02] p-3.5 rounded-2xl overflow-hidden">
+            {/* Animated Laser Scanning Line */}
+            <div className="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#5EEAD4] to-transparent animate-radar-sweep pointer-events-none" />
+
+            <div className="flex items-center justify-between text-xs mb-2">
+              <span className="font-mono text-[#5EEAD4] flex items-center gap-1.5 font-semibold">
+                <Search size={12} /> Autonomous Crawl Engine
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono">
+                <Activity size={10} /> 100% Synced
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
+              <div className="bg-[#161A28] border border-white/[0.06] p-2 rounded-xl">
+                <p className="text-[#8B91A4] text-[9px] uppercase">Indexed</p>
+                <p className="font-bold text-white mt-0.5">3 Key Pages</p>
+              </div>
+              <div className="bg-[#161A28] border border-white/[0.06] p-2 rounded-xl">
+                <p className="text-[#8B91A4] text-[9px] uppercase">Vectors</p>
+                <p className="font-bold text-[#5EEAD4] mt-0.5">768-D pgvector</p>
+              </div>
+              <div className="bg-[#161A28] border border-white/[0.06] p-2 rounded-xl">
+                <p className="text-[#8B91A4] text-[9px] uppercase">Latency</p>
+                <p className="font-bold text-[#A78BFA] mt-0.5">&lt; 300ms Groq</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom: Live Interactive Widget Box */}
+          <div className="border border-white/15 bg-[#141728] rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[340px]">
+            {/* Widget Header */}
+            <div className="bg-gradient-to-r from-[#7C6CFF] to-[#6366F1] px-4 py-2.5 flex items-center justify-between text-white shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="h-7 w-7 rounded-lg bg-white/20 flex items-center justify-center font-bold text-xs backdrop-blur-sm">
+                  <Bot size={16} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold leading-tight">Smart Assistant</p>
+                  <p className="text-[10px] opacity-90 flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Online • Grounded RAG
+                  </p>
+                </div>
+              </div>
+
+              <span className="text-[10px] font-mono bg-black/25 px-2 py-0.5 rounded-full text-white/90">
+                Llama 3.3 70B
+              </span>
+            </div>
+
+            {/* Chat Messages Scrollable Feed */}
+            <div className="flex-1 p-3.5 space-y-3 overflow-y-auto text-xs bg-[#090C16]">
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`flex ${
+                    m.sender === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 leading-relaxed text-xs ${
+                      m.sender === "user"
+                        ? "bg-[#7C6CFF] text-white rounded-tr-sm font-medium"
+                        : "bg-[#181C2E] border border-white/10 text-[#E2E6F0] rounded-tl-sm shadow-md"
+                    }`}
+                  >
+                    <p>{m.text}</p>
+                    {m.source && (
+                      <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-[#8B91A4]">
+                        <span className="font-mono text-[#5EEAD4] truncate max-w-[170px]">
+                          ✓ {m.source.replace("https://", "")}
+                        </span>
+                        <span className="font-mono text-[#A78BFA] shrink-0">
+                          ⚡ {m.latency}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-[#181C2E] border border-white/10 text-[#8B91A4] px-3.5 py-2 rounded-2xl rounded-tl-sm flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#5EEAD4] animate-bounce" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#5EEAD4] animate-bounce [animation-delay:0.2s]" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#5EEAD4] animate-bounce [animation-delay:0.4s]" />
+                    <span className="text-[10px] font-mono ml-1 text-[#5EEAD4]">
+                      Synthesizing facts...
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick interactive test chips */}
+            <div className="bg-[#0C0F1E] px-3 py-1.5 border-t border-white/[0.06] flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+              <span className="text-[10px] text-[#6C7286] shrink-0">Try:</span>
+              <button
+                type="button"
+                onClick={() => handleSend("What is your pricing?")}
+                className="text-[10px] font-mono bg-white/[0.04] hover:bg-white/[0.08] text-[#A1A7B8] hover:text-[#5EEAD4] border border-white/[0.06] px-2 py-0.5 rounded-md whitespace-nowrap transition-colors"
+              >
+                Pricing?
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSend("How does RAG work?")}
+                className="text-[10px] font-mono bg-white/[0.04] hover:bg-white/[0.08] text-[#A1A7B8] hover:text-[#5EEAD4] border border-white/[0.06] px-2 py-0.5 rounded-md whitespace-nowrap transition-colors"
+              >
+                How RAG works?
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSend("Can I customize the colors?")}
+                className="text-[10px] font-mono bg-white/[0.04] hover:bg-white/[0.08] text-[#A1A7B8] hover:text-[#5EEAD4] border border-white/[0.06] px-2 py-0.5 rounded-md whitespace-nowrap transition-colors"
+              >
+                Custom colors?
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSend("How do I embed it?")}
+                className="text-[10px] font-mono bg-white/[0.04] hover:bg-white/[0.08] text-[#A1A7B8] hover:text-[#5EEAD4] border border-white/[0.06] px-2 py-0.5 rounded-md whitespace-nowrap transition-colors"
+              >
+                1-line embed?
+              </button>
+            </div>
+
+            {/* Input bar */}
+            <div className="bg-[#0F1324] p-2 border-t border-white/10 flex items-center gap-2 shrink-0">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSend();
+                }}
+                placeholder="Ask this demo bot anything..."
+                className="flex-1 bg-transparent text-xs text-white placeholder-[#5C6378] outline-none px-2 font-sans"
+              />
+              <button
+                type="button"
+                onClick={() => handleSend()}
+                disabled={!inputValue.trim() || isTyping}
+                className="h-7 w-7 rounded-lg bg-[#7C6CFF] hover:bg-[#6857F8] disabled:opacity-40 text-white flex items-center justify-center transition-all shrink-0"
+              >
+                <Send size={12} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   INTERACTIVE 1-LINE EMBED CODE SHOWCASE
+========================================================= */
+function EmbedCodeShowcase() {
+  const [activeTab, setActiveTab] = useState<"script" | "react" | "next" | "webflow">("script");
+  const [copied, setCopied] = useState(false);
+
+  const snippets = {
+    script: `<!-- Paste anywhere before </body> -->
+<script
+  src="https://ai-bot-builder.app/embed.js"
+  data-bot-id="8844145e-06dc-428c-be58-45b266b678b2"
+  async
+></script>`,
+    react: `// In your React App or layout
+import { useEffect } from "react";
+
+export function BotWidget() {
+  useEffect(() => {
+    const s = document.createElement("script");
+    s.src = "https://ai-bot-builder.app/embed.js";
+    s.setAttribute("data-bot-id", "8844145e-06dc-428c-be58-45b266b678b2");
+    s.async = true;
+    document.body.appendChild(s);
+  }, []);
+
+  return null;
+}`,
+    next: `// In Next.js App Router (app/layout.tsx)
+import Script from "next/script";
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Script
+          src="https://ai-bot-builder.app/embed.js"
+          data-bot-id="8844145e-06dc-428c-be58-45b266b678b2"
+          strategy="lazyOnload"
+        />
+      </body>
+    </html>
+  );
+}`,
+    webflow: `<!-- In Webflow / WordPress / Shopify Custom Code -->
+<!-- Footer Code Section -->
+<script
+  src="https://ai-bot-builder.app/embed.js"
+  data-bot-id="8844145e-06dc-428c-be58-45b266b678b2"
+  defer
+></script>`,
+  };
+
+  function copyCode() {
+    navigator.clipboard.writeText(snippets[activeTab]);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="bg-[#101322] border border-white/15 rounded-3xl overflow-hidden shadow-2xl">
+      {/* Top Header with Language Tabs */}
+      <div className="bg-[#0C0F1C] px-4 py-3 border-b border-white/[0.08] flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/[0.06]">
+          {(
+            [
+              { key: "script", label: "HTML Script Tag" },
+              { key: "next", label: "Next.js" },
+              { key: "react", label: "React" },
+              { key: "webflow", label: "Webflow / Shopify" },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                activeTab === tab.key
+                  ? "bg-[#7C6CFF] text-white shadow-md shadow-[#7C6CFF]/30 font-semibold"
+                  : "text-[#8B91A4] hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={copyCode}
+          className="flex items-center gap-1.5 text-xs font-medium bg-white/[0.06] hover:bg-white/[0.12] text-white px-3.5 py-1.5 rounded-xl border border-white/10 transition-all active:scale-95"
+        >
+          {copied ? (
+            <>
+              <Check size={13} className="text-emerald-400" />
+              <span className="text-emerald-400 font-semibold">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Copy size={13} className="text-[#A78BFA]" />
+              <span>Copy Code</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Code Snippet Box */}
+      <div className="p-5 font-mono text-xs text-[#E1E5F2] overflow-x-auto leading-relaxed bg-[#080A14]">
+        <pre>{snippets[activeTab]}</pre>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   FAQ ACCORDION COMPONENT
+========================================================= */
+interface FaqItem {
+  q: string;
+  a: string;
+}
+
+function FaqAccordion() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const faqs: FaqItem[] = [
+    {
+      q: "How does AI Bot Builder crawl and read my website?",
+      a: "When you enter your URL, our autonomous crawler visits your pages, extracts the text, strips navigation menus and footer noise, chunks the content logically, and indexes it into 768-dimensional AI vector embeddings in Supabase pgvector.",
+    },
+    {
+      q: "Will the AI chatbot hallucinate or invent false facts?",
+      a: "No. Our RAG (Retrieval-Augmented Generation) pipeline feeds only your extracted text chunks into the context window. The system prompt strictly prohibits speculation: if information is not found in your indexed documents, the bot politely clarifies that.",
+    },
+    {
+      q: "Can I add more knowledge files like PDFs or TXT documents?",
+      a: "Yes! In your bot's Knowledge Base dashboard, you can upload custom TXT, Markdown, or product docs at any time. The bot merges web data and uploaded documentation seamlessly into its knowledge index.",
+    },
+    {
+      q: "How fast are the bot's chat responses?",
+      a: "Responses are powered by Groq LPUs running Llama 3.3 70B inference. Perceived latency is under 300ms, and responses stream back word-by-word with instant fluid typing.",
+    },
+    {
+      q: "Can I customize the bot's look to match my website branding?",
+      a: "Absolutely. You can customize the bot name, primary theme color, header gradients, welcome greeting, bot avatar, and corner border radius directly from the dashboard visual studio.",
+    },
+    {
+      q: "What website platforms are supported for embedding?",
+      a: "Every platform that supports HTML or JavaScript! That includes Webflow, Shopify, WordPress, Squarespace, Framer, Wix, custom React/Vue apps, Next.js, and static HTML pages.",
+    },
+  ];
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-3">
+      {faqs.map((faq, idx) => {
+        const isOpen = openIndex === idx;
+        return (
+          <div
+            key={idx}
+            className={`border rounded-2xl transition-all duration-200 overflow-hidden ${
+              isOpen
+                ? "border-[#7C6CFF]/40 bg-[#121626]"
+                : "border-white/[0.08] bg-[#0E111E] hover:border-white/15"
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => setOpenIndex(isOpen ? null : idx)}
+              className="w-full px-6 py-4.5 text-left flex items-center justify-between gap-4"
+            >
+              <span className="font-semibold text-sm sm:text-base text-white">
+                {faq.q}
+              </span>
+              <ChevronDown
+                size={18}
+                className={`text-[#8B91A4] shrink-0 transition-transform duration-300 ${
+                  isOpen ? "rotate-180 text-[#5EEAD4]" : ""
+                }`}
+              />
+            </button>
+            {isOpen && (
+              <div className="px-6 pb-5 pt-1 text-sm text-[#949AA8] leading-relaxed border-t border-white/[0.04]">
+                {faq.a}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* =========================================================
+   MAIN LANDING PAGE
+========================================================= */
 export default function LandingPage() {
   const router = useRouter();
 
   const [user, setUser] = useState<any>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [inputUrl, setInputUrl] = useState("");
+  const [activeTheme, setActiveTheme] = useState<
+    "violet" | "emerald" | "cyan" | "coral" | "gold"
+  >("violet");
 
   useEffect(() => {
     async function loadUser() {
@@ -165,1569 +678,874 @@ export default function LandingPage() {
     loadUser();
   }, []);
 
-  function startBuilding() {
-    if (user) {
-      router.push("/create");
+  function handleStart(targetUrl?: string) {
+    const finalUrl = targetUrl || inputUrl;
+    if (finalUrl.trim()) {
+      if (user) {
+        router.push(`/create?url=${encodeURIComponent(finalUrl.trim())}`);
+      } else {
+        router.push(
+          `/login?redirect=${encodeURIComponent(
+            `/create?url=${encodeURIComponent(finalUrl.trim())}`
+          )}`
+        );
+      }
     } else {
-      router.push("/login");
+      if (user) {
+        router.push("/create");
+      } else {
+        router.push("/login");
+      }
     }
   }
 
   async function handleLogout() {
-    const { error } = await supabaseClient.auth.signOut();
-
-    if (error) {
-      console.error("Logout error:", error.message);
-      alert("Logout failed. Please try again.");
-      return;
-    }
-
+    await supabaseClient.auth.signOut();
     setUser(null);
     router.refresh();
   }
 
+  const themes = {
+    violet: {
+      name: "Electric Violet",
+      primary: "#7C6CFF",
+      accent: "#A78BFA",
+      gradient: "from-[#7C6CFF] to-[#6366F1]",
+    },
+    emerald: {
+      name: "Cyber Mint",
+      primary: "#10B981",
+      accent: "#34D399",
+      gradient: "from-[#10B981] to-[#059669]",
+    },
+    cyan: {
+      name: "Cosmic Cyan",
+      primary: "#06B6D4",
+      accent: "#5EEAD4",
+      gradient: "from-[#06B6D4] to-[#0EA5E9]",
+    },
+    coral: {
+      name: "Neon Sunset",
+      primary: "#FF6B4A",
+      accent: "#FB7185",
+      gradient: "from-[#FF6B4A] to-[#F43F5E]",
+    },
+    gold: {
+      name: "Solar Gold",
+      primary: "#F59E0B",
+      accent: "#FCD34D",
+      gradient: "from-[#F59E0B] to-[#D97706]",
+    },
+  };
+
   return (
-    <main className="relative min-h-screen text-[#EDEFF4] font-[Inter,sans-serif] selection:bg-[#5EEAD4]/30 selection:text-white">
-      <EmberSmokeBackground />
-      <BotGreeting />
-      <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+    <main className="relative min-h-screen text-[#ECEFF6] font-sans selection:bg-[#7C6CFF]/30 selection:text-white">
+      <AmbientCosmicBackground />
+      <FloatingBotMascot />
 
-        .font-display {
-          font-family: "Space Grotesk", sans-serif;
-        }
-        .font-mono {
-          font-family: "JetBrains Mono", monospace;
-        }
+      {/* =========================================================
+          TOP FLOATING NAVBAR
+      ========================================================= */}
+      <header className="sticky top-0 z-40 max-w-7xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6">
+        <nav className="bg-[#101322]/85 backdrop-blur-2xl border border-white/[0.08] rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-between shadow-[0_10px_35px_rgba(0,0,0,0.5)]">
+          {/* Logo & Brand */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#7C6CFF] via-[#5EEAD4] to-[#FF6B4A] p-[1.5px] shadow-lg shadow-[#7C6CFF]/20 group-hover:scale-105 transition-transform duration-300">
+              <div className="w-full h-full bg-[#0D0F19] rounded-[10px] flex items-center justify-center text-[#5EEAD4]">
+                <Bot size={20} strokeWidth={2.4} />
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
+                AI Bot Builder
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.2 rounded bg-[#7C6CFF]/15 text-[#5EEAD4] border border-[#7C6CFF]/30 font-semibold">
+                  v2.0
+                </span>
+              </span>
+            </div>
+          </Link>
 
-        @keyframes scanline {
-          0% {
-            top: 8%;
-            opacity: 0;
-          }
-          8% {
-            opacity: 1;
-          }
-          45% {
-            opacity: 1;
-          }
-          55% {
-            opacity: 0;
-          }
-          100% {
-            top: 92%;
-            opacity: 0;
-          }
-        }
-        .scanline {
-          animation: scanline 4.5s ease-in-out infinite;
-        }
-
-        @keyframes chip-in {
-          from {
-            opacity: 0;
-            transform: translateY(6px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .chip-1 {
-          animation: chip-in 0.5s ease-out 0.6s both,
-            chip-fade 4.5s ease-in-out infinite;
-        }
-        .chip-2 {
-          animation: chip-in 0.5s ease-out 1.5s both,
-            chip-fade 4.5s ease-in-out infinite;
-        }
-        .chip-3 {
-          animation: chip-in 0.5s ease-out 2.4s both,
-            chip-fade 4.5s ease-in-out infinite;
-        }
-        @keyframes chip-fade {
-          0%,
-          92% {
-            opacity: 1;
-          }
-          97%,
-          100% {
-            opacity: 0;
-          }
-        }
-
-        @keyframes typing-dot {
-          0%,
-          60%,
-          100% {
-            opacity: 0.25;
-            transform: translateY(0);
-          }
-          30% {
-            opacity: 1;
-            transform: translateY(-2px);
-          }
-        }
-        .dot-a {
-          animation: typing-dot 1.2s ease-in-out infinite;
-        }
-        .dot-b {
-          animation: typing-dot 1.2s ease-in-out infinite 0.15s;
-        }
-        .dot-c {
-          animation: typing-dot 1.2s ease-in-out infinite 0.3s;
-        }
-
-        @keyframes bubble-in {
-          0%,
-          15% {
-            opacity: 0;
-            transform: translateY(8px) scale(0.96);
-          }
-          25%,
-          90% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(8px) scale(0.96);
-          }
-        }
-        .bubble-in {
-          animation: bubble-in 4.5s ease-in-out infinite;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .scanline,
-          .chip-1,
-          .chip-2,
-          .chip-3,
-          .dot-a,
-          .dot-b,
-          .dot-c,
-          .bubble-in {
-            animation: none !important;
-            opacity: 1 !important;
-          }
-        }
-
-        .smoke-blob {
-          position: absolute;
-          border-radius: 9999px;
-          filter: blur(30px);
-          mix-blend-mode: screen;
-          will-change: transform, opacity;
-        }
-        .blob-a {
-          top: -10%;
-          left: 5%;
-          width: 55vw;
-          height: 55vw;
-          background: radial-gradient(
-            circle,
-            rgba(255, 107, 74, 0.28) 0%,
-            rgba(255, 107, 74, 0) 70%
-          );
-          animation: drift-a 34s ease-in-out infinite;
-        }
-        .blob-b {
-          bottom: -15%;
-          right: 0%;
-          width: 60vw;
-          height: 60vw;
-          background: radial-gradient(
-            circle,
-            rgba(200, 60, 30, 0.22) 0%,
-            rgba(200, 60, 30, 0) 70%
-          );
-          animation: drift-b 40s ease-in-out infinite;
-        }
-        .blob-c {
-          top: 30%;
-          right: 20%;
-          width: 40vw;
-          height: 40vw;
-          background: radial-gradient(
-            circle,
-            rgba(94, 234, 212, 0.08) 0%,
-            rgba(94, 234, 212, 0) 70%
-          );
-          animation: drift-c 46s ease-in-out infinite;
-        }
-        .blob-d {
-          bottom: 10%;
-          left: 15%;
-          width: 35vw;
-          height: 35vw;
-          background: radial-gradient(
-            circle,
-            rgba(255, 140, 90, 0.16) 0%,
-            rgba(255, 140, 90, 0) 70%
-          );
-          animation: drift-d 38s ease-in-out infinite;
-        }
-
-        @keyframes drift-a {
-          0%,
-          100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(6vw, 8vh) scale(1.15);
-          }
-          66% {
-            transform: translate(-4vw, 4vh) scale(0.95);
-          }
-        }
-        @keyframes drift-b {
-          0%,
-          100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(-8vw, -6vh) scale(1.1);
-          }
-          66% {
-            transform: translate(3vw, -3vh) scale(0.9);
-          }
-        }
-        @keyframes drift-c {
-          0%,
-          100% {
-            transform: translate(0, 0) scale(1);
-          }
-          50% {
-            transform: translate(-5vw, 7vh) scale(1.2);
-          }
-        }
-        @keyframes drift-d {
-          0%,
-          100% {
-            transform: translate(0, 0) scale(1);
-          }
-          50% {
-            transform: translate(5vw, -6vh) scale(1.1);
-          }
-        }
-
-        .vignette {
-          background: radial-gradient(
-            ellipse at center,
-            rgba(11, 14, 20, 0) 40%,
-            rgba(11, 14, 20, 0.85) 100%
-          );
-        }
-
-
-        @media (prefers-reduced-motion: reduce) {
-          .smoke-blob {
-            animation: none !important;
-          }
-        }
-
-        .bot-float {
-  animation: bot-bob 3.4s ease-in-out infinite;
-  will-change: transform;
-}
-
-@keyframes bot-bob {
-  0%,100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(-1.5deg);
-  }
-}
-
-.bot-eye {
-  animation: bot-blink 4.2s ease-in-out infinite;
-  transform-origin: center;
-}
-
-@keyframes bot-blink {
-  0%,92%,100% {
-    transform: scaleY(1);
-  }
-  96% {
-    transform: scaleY(0.1);
-  }
-}
-
-.speech-bubble {
-  animation: bubble-float 3.4s ease-in-out infinite;
-}
-
-@keyframes bubble-float {
-  0%,100% {
-    transform: translate(-50%,0);
-  }
-  50% {
-    transform: translate(-50%,-6px);
-  }
-}
-
-.type-cursor {
-  display:inline-block;
-  margin-left:2px;
-  animation: cursor-blink .9s step-end infinite;
-}
-
-@keyframes cursor-blink {
-  0%,100% {
-    opacity:1;
-  }
-  50% {
-    opacity:0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bot-float,
-  .bot-eye,
-  .speech-bubble,
-  .type-cursor {
-    animation:none !important;
-  }
-}
-      `}
-      
-      
-      </style>
-
-      {/* NAVBAR */}
-      <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div
-          className="flex items-center gap-2.5 cursor-pointer group"
-          onClick={() => router.push("/")}
-        >
-          <div className="w-9 h-9 rounded-lg bg-[#5EEAD4] flex items-center justify-center text-[#0B0E14] group-hover:rotate-6 transition-transform">
-            <Bot size={20} strokeWidth={2.4} />
-          </div>
-          <span className="text-lg font-display font-semibold tracking-tight">
-            AI Bot Builder
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {!loadingUser && !user && (
-            <>
-              <button
-                onClick={() => router.push("/login")}
-                className="px-4 py-2.5 text-sm text-[#8A93A6] hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4] rounded-lg"
-              >
-                Log in
-              </button>
-
-              <button
-                onClick={() => router.push("/signup")}
-                className="text-sm bg-[#EDEFF4] text-[#0B0E14] px-4 py-2.5 rounded-lg font-medium hover:bg-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0E14]"
-              >
-                Create account
-              </button>
-            </>
-          )}
-
-          {!loadingUser && user && (
-            <>
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="text-sm bg-[#EDEFF4] text-[#0B0E14] px-4 py-2.5 rounded-lg font-medium hover:bg-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0E14]"
-              >
-                Dashboard
-              </button>
-
-              <button
-                onClick={handleLogout}
-                className="text-sm border border-[#232838] text-[#8A93A6] px-4 py-2.5 rounded-lg font-medium hover:border-[#3a4257] hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4]"
-              >
-                Log out
-              </button>
-            </>
-          )}
-        </div>
-      </nav>
-
-      {/* HERO */}
-      <section className="max-w-6xl mx-auto px-6 pt-16 pb-28 grid lg:grid-cols-2 gap-16 items-center">
-        <div>
-          <div className="inline-flex items-center gap-2 border border-[#232838] bg-[#12161F] px-3.5 py-1.5 rounded-full text-xs font-mono text-[#5EEAD4] mb-7">
-            <ScanLine size={13} />
-            url in, assistant out
-          </div>
-
-          <h1 className="text-4xl md:text-6xl font-display font-semibold tracking-tight leading-[1.08]">
-            Your website already
-            <span className="block text-[#5EEAD4] mt-1">
-              knows the answers.
-            </span>
-          </h1>
-
-          <p className="mt-6 text-lg text-[#8A93A6] max-w-lg leading-relaxed">
-            Point it at a URL. We crawl the content, turn it into searchable
-            knowledge, and hand you a chat assistant that actually knows your
-            product — ready to embed anywhere.
-          </p>
-
-          <div className="mt-9 flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={startBuilding}
-              className="bg-[#FF6B4A] hover:bg-[#ff7f5f] text-[#0B0E14] px-6 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0E14]"
+          {/* Desktop Center Links */}
+          <div className="hidden lg:flex items-center gap-7 text-xs sm:text-sm text-[#8B91A4]">
+            <a
+              href="#how-it-works"
+              className="hover:text-white transition-colors"
             >
-              Build your AI bot
-              <ArrowRight size={18} />
-            </button>
+              How it Works
+            </a>
+            <a href="#features" className="hover:text-white transition-colors">
+              Platform
+            </a>
+            <a href="#demo" className="hover:text-white transition-colors">
+              Live Sandbox
+            </a>
+            <a
+              href="#embed-code"
+              className="hover:text-white transition-colors"
+            >
+              Embed 1-Line
+            </a>
+            <a href="#customizer" className="hover:text-white transition-colors">
+              Themes
+            </a>
+            <a href="#faq" className="hover:text-white transition-colors">
+              FAQ
+            </a>
+          </div>
 
-            {user && (
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="border border-[#232838] hover:border-[#3a4257] px-6 py-3.5 rounded-xl font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4]"
-              >
-                View dashboard
-              </button>
+          {/* Right Action Controls */}
+          <div className="flex items-center gap-2.5">
+            {!loadingUser && !user && (
+              <>
+                <Link
+                  href="/login"
+                  className="px-3 py-1.5 text-xs sm:text-sm font-medium text-[#8B91A4] hover:text-white transition-colors"
+                >
+                  Log in
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => handleStart()}
+                  className="text-xs sm:text-sm bg-gradient-to-r from-[#7C6CFF] to-[#5EEAD4] hover:brightness-110 text-[#07080D] px-4 py-2 rounded-xl font-bold transition-all shadow-lg shadow-[#7C6CFF]/25 active:scale-95 flex items-center gap-1.5"
+                >
+                  <span>Build Bot</span>
+                  <ArrowRight size={14} />
+                </button>
+              </>
+            )}
+
+            {!loadingUser && user && (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-xs sm:text-sm bg-white/10 hover:bg-white/15 text-white border border-white/15 px-3.5 py-2 rounded-xl font-medium transition-colors"
+                >
+                  Dashboard
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="text-xs sm:text-sm text-[#8B91A4] hover:text-white px-2.5 py-2 transition-colors"
+                >
+                  Log out
+                </button>
+              </>
             )}
           </div>
+        </nav>
+      </header>
+
+      {/* =========================================================
+          HERO SECTION
+      ========================================================= */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-20 sm:pb-32">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          {/* Left Hero Copy & Interactive Launcher */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* Top Announcement Badge */}
+            <div className="inline-flex items-center gap-2.5 border border-[#7C6CFF]/30 bg-[#7C6CFF]/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-medium text-[#A78BFA] shadow-inner">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5EEAD4] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#5EEAD4]"></span>
+              </span>
+              <span>Autonomous Website RAG • Zero Training Code</span>
+            </div>
+
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight text-white leading-[1.07]">
+              Your website already knows the answers.{" "}
+              <span className="bg-gradient-to-r from-[#5EEAD4] via-[#7C6CFF] to-[#FF6B4A] bg-clip-text text-transparent">
+                Give it a voice with AI.
+              </span>
+            </h1>
+
+            {/* Sub-headline */}
+            <p className="text-base sm:text-lg text-[#949AA8] max-w-xl leading-relaxed">
+              Point it at a URL. We crawl the content, turn it into searchable
+              vector knowledge, and hand you a chat assistant that actually
+              knows your product — ready to embed anywhere in 30 seconds.
+            </p>
+
+            {/* LIVE URL GENERATOR INPUT */}
+            <div className="pt-2 max-w-xl">
+              <div className="bg-[#121526]/90 border border-white/20 p-2 rounded-2xl shadow-[0_12px_45px_rgba(0,0,0,0.6)] flex flex-col sm:flex-row gap-2 transition-all focus-within:border-[#7C6CFF]/70 focus-within:ring-2 focus-within:ring-[#7C6CFF]/20">
+                <div className="flex items-center gap-2.5 px-3 flex-1 min-w-0">
+                  <Globe size={18} className="text-[#5EEAD4] shrink-0" />
+                  <input
+                    type="url"
+                    value={inputUrl}
+                    onChange={(e) => setInputUrl(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleStart();
+                    }}
+                    placeholder="https://yourcompany.com"
+                    className="w-full bg-transparent text-sm text-white placeholder-[#555C6D] outline-none font-mono"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleStart()}
+                  className="bg-gradient-to-r from-[#FF6B4A] to-[#FF896B] hover:brightness-110 active:scale-95 text-[#07080D] px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#FF6B4A]/30 transition-all shrink-0"
+                >
+                  Build your AI bot
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+
+              {/* Sample quick picks */}
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#6F7585]">
+                <span>Try with:</span>
+                {[
+                  "stripe.com",
+                  "linear.app",
+                  "github.com",
+                  "supabase.com",
+                  "openai.com",
+                ].map((domain) => (
+                  <button
+                    key={domain}
+                    type="button"
+                    onClick={() => {
+                      setInputUrl(`https://${domain}`);
+                      handleStart(`https://${domain}`);
+                    }}
+                    className="font-mono text-[#A1A7B8] hover:text-[#5EEAD4] bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] px-2.5 py-0.5 rounded-md transition-colors"
+                  >
+                    {domain}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* TRUST / CAPABILITY PILLS */}
+            <div className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs border-t border-white/[0.06]">
+              <div className="flex items-center gap-2 text-[#949AA8]">
+                <Zap size={14} className="text-[#FF6B4A]" />
+                <span>&lt; 30s Setup</span>
+              </div>
+              <div className="flex items-center gap-2 text-[#949AA8]">
+                <ShieldCheck size={14} className="text-[#5EEAD4]" />
+                <span>Zero Hallucinations</span>
+              </div>
+              <div className="flex items-center gap-2 text-[#949AA8]">
+                <Code2 size={14} className="text-[#7C6CFF]" />
+                <span>1-Line Embed Script</span>
+              </div>
+              <div className="flex items-center gap-2 text-[#949AA8]">
+                <BrainCircuit size={14} className="text-[#22D3C8]" />
+                <span>Groq Llama 3.3 RAG</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Hero Interactive Simulator */}
+          <div id="demo" className="lg:col-span-5">
+            <HeroInteractiveSimulator />
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          KEY STATS STRIP
+      ========================================================= */}
+      <section className="border-y border-white/[0.08] bg-[#0A0D18]/70 backdrop-blur-xl py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+              <p className="text-3xl sm:text-4xl font-extrabold text-white font-mono">
+                30s
+              </p>
+              <p className="text-xs sm:text-sm text-[#8B91A4] mt-1">
+                Average Crawl to Embed Time
+              </p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+              <p className="text-3xl sm:text-4xl font-extrabold text-[#5EEAD4] font-mono">
+                &lt; 300ms
+              </p>
+              <p className="text-xs sm:text-sm text-[#8B91A4] mt-1">
+                Groq Token Streaming Latency
+              </p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+              <p className="text-3xl sm:text-4xl font-extrabold text-[#A78BFA] font-mono">
+                100%
+              </p>
+              <p className="text-xs sm:text-sm text-[#8B91A4] mt-1">
+                Grounded in Scraped Facts
+              </p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+              <p className="text-3xl sm:text-4xl font-extrabold text-[#FF6B4A] font-mono">
+                1 Line
+              </p>
+              <p className="text-xs sm:text-sm text-[#8B91A4] mt-1">
+                Drop-in Universal Code Tag
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          HOW IT WORKS (NEURAL PIPELINE)
+      ========================================================= */}
+      <section
+        id="how-it-works"
+        className="max-w-7xl mx-auto px-4 sm:px-6 py-28"
+      >
+        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+          <span className="text-xs font-mono uppercase tracking-widest text-[#5EEAD4] bg-[#5EEAD4]/10 border border-[#5EEAD4]/20 px-3.5 py-1 rounded-full font-semibold">
+            How It Works
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+            From raw URL to live chatbot in 3 steps
+          </h2>
+          <p className="text-sm sm:text-base text-[#8B91A4]">
+            Our autonomous pipeline orchestrates web scraping, noise
+            distillation, vector embeddings, and streaming LLM generation.
+          </p>
         </div>
 
-        {/* SIGNATURE VISUAL: url -> scan -> chat */}
-        <div className="relative">
-          <div className="rounded-2xl border border-[#232838] bg-[#12161F] overflow-hidden shadow-[0_0_0_1px_rgba(94,234,212,0.04)]">
-            <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[#232838]">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#3a4257]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#3a4257]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#3a4257]" />
-              <span className="ml-3 font-mono text-xs text-[#8A93A6]">
-                your-company.com
+        <div className="grid md:grid-cols-3 gap-8 relative">
+          {/* Step 1 */}
+          <div className="bg-[#111422] border border-white/[0.08] hover:border-[#7C6CFF]/50 p-8 rounded-3xl transition-all duration-300 group hover:-translate-y-1.5 shadow-xl">
+            <div className="h-12 w-12 rounded-2xl bg-[#7C6CFF]/15 border border-[#7C6CFF]/30 text-[#7C6CFF] flex items-center justify-center font-bold mb-6 group-hover:scale-110 transition-transform">
+              <Globe size={24} />
+            </div>
+            <span className="text-xs font-mono text-[#5EEAD4] font-semibold">
+              STEP 01
+            </span>
+            <h3 className="text-xl font-bold text-white mt-1 mb-2.5">
+              Deep Web Scraping
+            </h3>
+            <p className="text-sm text-[#8B91A4] leading-relaxed mb-4">
+              Enter your domain. Our scraper strips navigational clutter,
+              extracts pure markdown text, and segments your pages into
+              manageable chunks.
+            </p>
+            <div className="bg-[#0A0D17] p-3 rounded-xl border border-white/[0.06] text-[11px] font-mono text-[#7E8599]">
+              <span className="text-emerald-400">✓</span> Parsed pricing, FAQs &
+              docs
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div className="bg-[#111422] border border-white/[0.08] hover:border-[#5EEAD4]/50 p-8 rounded-3xl transition-all duration-300 group hover:-translate-y-1.5 shadow-xl">
+            <div className="h-12 w-12 rounded-2xl bg-[#5EEAD4]/15 border border-[#5EEAD4]/30 text-[#5EEAD4] flex items-center justify-center font-bold mb-6 group-hover:scale-110 transition-transform">
+              <BrainCircuit size={24} />
+            </div>
+            <span className="text-xs font-mono text-[#5EEAD4] font-semibold">
+              STEP 02
+            </span>
+            <h3 className="text-xl font-bold text-white mt-1 mb-2.5">
+              Semantic Vector Index
+            </h3>
+            <p className="text-sm text-[#8B91A4] leading-relaxed mb-4">
+              Content is encoded into 768-dimensional AI vector embeddings via
+              Gemini and stored in Supabase pgvector for sub-second semantic
+              similarity lookup.
+            </p>
+            <div className="bg-[#0A0D17] p-3 rounded-xl border border-white/[0.06] text-[11px] font-mono text-[#7E8599]">
+              <span className="text-[#5EEAD4]">✓</span> Stored in Supabase
+              pgvector
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="bg-[#111422] border border-white/[0.08] hover:border-[#FF6B4A]/50 p-8 rounded-3xl transition-all duration-300 group hover:-translate-y-1.5 shadow-xl">
+            <div className="h-12 w-12 rounded-2xl bg-[#FF6B4A]/15 border border-[#FF6B4A]/30 text-[#FF6B4A] flex items-center justify-center font-bold mb-6 group-hover:scale-110 transition-transform">
+              <Code2 size={24} />
+            </div>
+            <span className="text-xs font-mono text-[#5EEAD4] font-semibold">
+              STEP 03
+            </span>
+            <h3 className="text-xl font-bold text-white mt-1 mb-2.5">
+              1-Line Drop-in Embed
+            </h3>
+            <p className="text-sm text-[#8B91A4] leading-relaxed mb-4">
+              Copy one HTML script tag to your site. Visitors immediately
+              interact with a customized, responsive assistant streaming
+              answers in real time.
+            </p>
+            <div className="bg-[#0A0D17] p-3 rounded-xl border border-white/[0.06] text-[11px] font-mono text-[#7E8599]">
+              <span className="text-[#FF6B4A]">✓</span> Compatible with all
+              frameworks
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          BENTO GRID OF CORE PLATFORM FEATURES
+      ========================================================= */}
+      <section
+        id="features"
+        className="border-t border-white/[0.08] bg-[#0A0D18]/60 py-28"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+            <span className="text-xs font-mono uppercase tracking-widest text-[#7C6CFF] bg-[#7C6CFF]/10 border border-[#7C6CFF]/20 px-3.5 py-1 rounded-full font-semibold">
+              Platform Features
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Engineered for speed, privacy, and control
+            </h2>
+            <p className="text-sm sm:text-base text-[#8B91A4]">
+              Everything you need to deliver an enterprise-grade AI assistant
+              without maintaining ML infrastructure.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Card 1 */}
+            <div className="bg-[#111422] border border-white/[0.08] hover:border-white/20 p-7 rounded-3xl transition-all space-y-4 hover:shadow-2xl">
+              <div className="h-10 w-10 rounded-xl bg-[#7C6CFF]/10 border border-[#7C6CFF]/20 text-[#A78BFA] flex items-center justify-center">
+                <Zap size={20} />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                Sub-Second Streaming
+              </h3>
+              <p className="text-sm text-[#8B91A4] leading-relaxed">
+                Powered by Groq LPUs running Llama 3.3 for lightning-fast
+                streaming responses with zero perceived wait time.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className="bg-[#111422] border border-white/[0.08] hover:border-white/20 p-7 rounded-3xl transition-all space-y-4 hover:shadow-2xl">
+              <div className="h-10 w-10 rounded-xl bg-[#5EEAD4]/10 border border-[#5EEAD4]/20 text-[#5EEAD4] flex items-center justify-center">
+                <Database size={20} />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                Hybrid Knowledge Hub
+              </h3>
+              <p className="text-sm text-[#8B91A4] leading-relaxed">
+                Supplement crawled web data by uploading custom TXT, Markdown,
+                or documentation files with automatic chunk management.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="bg-[#111422] border border-white/[0.08] hover:border-white/20 p-7 rounded-3xl transition-all space-y-4 hover:shadow-2xl">
+              <div className="h-10 w-10 rounded-xl bg-[#FF6B4A]/10 border border-[#FF6B4A]/20 text-[#FF6B4A] flex items-center justify-center">
+                <Sliders size={20} />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                Live Visual Studio
+              </h3>
+              <p className="text-sm text-[#8B91A4] leading-relaxed">
+                Change primary colors, header palettes, logo uploads, corner
+                roundness, and welcome greetings in real time with live preview.
+              </p>
+            </div>
+
+            {/* Card 4 */}
+            <div className="bg-[#111422] border border-white/[0.08] hover:border-white/20 p-7 rounded-3xl transition-all space-y-4 hover:shadow-2xl">
+              <div className="h-10 w-10 rounded-xl bg-[#22D3C8]/10 border border-[#22D3C8]/20 text-[#22D3C8] flex items-center justify-center">
+                <BarChart3 size={20} />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                Query Analytics
+              </h3>
+              <p className="text-sm text-[#8B91A4] leading-relaxed">
+                Track inquiry volume, top customer questions, 7-day conversation
+                trends, and export conversation transcripts to CSV.
+              </p>
+            </div>
+
+            {/* Card 5 */}
+            <div className="bg-[#111422] border border-white/[0.08] hover:border-white/20 p-7 rounded-3xl transition-all space-y-4 hover:shadow-2xl">
+              <div className="h-10 w-10 rounded-xl bg-[#A855F7]/10 border border-[#A855F7]/20 text-[#C084FC] flex items-center justify-center">
+                <ShieldCheck size={20} />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                Strict Fact Grounding
+              </h3>
+              <p className="text-sm text-[#8B91A4] leading-relaxed">
+                Bots are instructed to answer strictly based on indexed facts. If
+                information is missing, they state it transparently.
+              </p>
+            </div>
+
+            {/* Card 6 */}
+            <div className="bg-[#111422] border border-white/[0.08] hover:border-white/20 p-7 rounded-3xl transition-all space-y-4 hover:shadow-2xl">
+              <div className="h-10 w-10 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 text-[#60A5FA] flex items-center justify-center">
+                <Sparkles size={20} />
+              </div>
+              <h3 className="text-lg font-bold text-white">
+                Dual-Pane Playground
+              </h3>
+              <p className="text-sm text-[#8B91A4] leading-relaxed">
+                Test queries and responses inside an interactive sandbox
+                simulator with quick test prompts before rolling out to
+                production.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          INTERACTIVE 1-LINE EMBED CODE SECTION
+      ========================================================= */}
+      <section id="embed-code" className="max-w-7xl mx-auto px-4 sm:px-6 py-28">
+        <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+          <span className="text-xs font-mono uppercase tracking-widest text-[#FF6B4A] bg-[#FF6B4A]/10 border border-[#FF6B4A]/20 px-3.5 py-1 rounded-full font-semibold">
+            Seamless Integration
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+            Embed on any site in seconds
+          </h2>
+          <p className="text-sm sm:text-base text-[#8B91A4]">
+            Copy one clean code snippet. No complex npm packages or build steps
+            required.
+          </p>
+        </div>
+
+        <div className="max-w-4xl mx-auto">
+          <EmbedCodeShowcase />
+        </div>
+      </section>
+
+      {/* =========================================================
+          INTERACTIVE CUSTOMIZER SHOWCASE
+      ========================================================= */}
+      <section
+        id="customizer"
+        className="border-t border-white/[0.08] bg-[#0A0D18]/80 py-24"
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+            <span className="text-xs font-mono uppercase tracking-widest text-[#5EEAD4] bg-[#5EEAD4]/10 border border-[#5EEAD4]/20 px-3.5 py-1 rounded-full font-semibold">
+              Live Theme Studio
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Matches any brand aesthetic
+            </h2>
+            <p className="text-sm sm:text-base text-[#8B91A4]">
+              Switch theme presets below to see how the assistant widget
+              seamlessly transforms.
+            </p>
+          </div>
+
+          {/* Theme switcher tabs */}
+          <div className="flex flex-wrap justify-center gap-2.5 mb-10">
+            {(Object.keys(themes) as Array<keyof typeof themes>).map((key) => {
+              const th = themes[key];
+              const isSelected = activeTheme === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setActiveTheme(key)}
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${
+                    isSelected
+                      ? "bg-white text-[#0A0D18] shadow-lg shadow-white/20 scale-105"
+                      : "bg-white/[0.04] text-[#8B91A4] hover:text-white border border-white/[0.08]"
+                  }`}
+                >
+                  <span
+                    className="h-3 w-3 rounded-full"
+                    style={{ backgroundColor: th.primary }}
+                  />
+                  {th.name}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Theme Preview Card */}
+          <div className="max-w-md mx-auto bg-[#141728] border border-white/20 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] overflow-hidden transition-all duration-300">
+            <div
+              className={`px-5 py-4 text-white flex items-center justify-between transition-all duration-300 bg-gradient-to-r ${themes[activeTheme].gradient}`}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="h-8 w-8 rounded-full bg-white/25 flex items-center justify-center font-bold text-xs">
+                  AI
+                </div>
+                <div>
+                  <p className="font-bold text-sm leading-tight">
+                    Your Assistant
+                  </p>
+                  <p className="text-[11px] opacity-90 flex items-center gap-1 mt-0.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    Online & Ready
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs bg-black/25 px-2.5 py-1 rounded-full font-mono text-white/90">
+                {themes[activeTheme].primary}
               </span>
             </div>
 
-            <div className="relative p-6 h-[280px] overflow-hidden">
-              <div className="scanline absolute left-0 right-0 h-px bg-[#5EEAD4] shadow-[0_0_12px_2px_rgba(94,234,212,0.6)]" />
-
-              <div className="space-y-2.5">
-                <div className="h-3 w-3/4 rounded bg-[#1c2231]" />
-                <div className="h-3 w-1/2 rounded bg-[#1c2231]" />
-                <div className="h-3 w-5/6 rounded bg-[#1c2231]" />
-              </div>
-
-              <div className="flex flex-wrap gap-2 mt-6">
-                <span className="chip-1 font-mono text-xs px-3 py-1.5 rounded-full bg-[#5EEAD4]/10 text-[#5EEAD4] border border-[#5EEAD4]/25">
-                  Pricing
-                </span>
-                <span className="chip-2 font-mono text-xs px-3 py-1.5 rounded-full bg-[#5EEAD4]/10 text-[#5EEAD4] border border-[#5EEAD4]/25">
-                  FAQ
-                </span>
-                <span className="chip-3 font-mono text-xs px-3 py-1.5 rounded-full bg-[#5EEAD4]/10 text-[#5EEAD4] border border-[#5EEAD4]/25">
-                  Product docs
-                </span>
-              </div>
-
-              <div className="bubble-in absolute bottom-6 right-6 left-6 bg-[#0B0E14] border border-[#232838] rounded-xl rounded-br-sm p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-5 h-5 rounded-md bg-[#5EEAD4] flex items-center justify-center text-[#0B0E14]">
-                    <Bot size={12} />
-                  </div>
-                  <span className="text-xs text-[#8A93A6] font-mono">
-                    assistant
-                  </span>
+            <div className="p-5 space-y-3 bg-[#0A0D18] text-xs">
+              <div className="flex justify-start">
+                <div className="bg-[#171B2B] text-[#D1D5DB] px-3.5 py-2.5 rounded-2xl rounded-tl-sm border border-white/[0.08]">
+                  Hello! How can I help you explore our services today?
                 </div>
-                <div className="flex gap-1 items-end h-3">
-                  <span className="dot-a w-1.5 h-1.5 rounded-full bg-[#8A93A6]" />
-                  <span className="dot-b w-1.5 h-1.5 rounded-full bg-[#8A93A6]" />
-                  <span className="dot-c w-1.5 h-1.5 rounded-full bg-[#8A93A6]" />
+              </div>
+              <div className="flex justify-end">
+                <div
+                  className="text-white px-3.5 py-2.5 rounded-2xl rounded-tr-sm font-medium transition-colors"
+                  style={{ backgroundColor: themes[activeTheme].primary }}
+                >
+                  Can I customize the primary color and placement?
+                </div>
+              </div>
+              <div className="flex justify-start">
+                <div className="bg-[#171B2B] text-[#D1D5DB] px-3.5 py-2.5 rounded-2xl rounded-tl-sm border border-white/[0.08]">
+                  Yes! Choose any hex color, logo upload, and corner radius
+                  directly from Bot Settings.
                 </div>
               </div>
             </div>
           </div>
-
-          <div className="absolute -z-10 -inset-6 bg-[#5EEAD4]/5 blur-3xl rounded-full" />
         </div>
       </section>
 
-      {/* HOW IT WORKS — connected thread, not numbered cards */}
-      <section className="border-y border-[#232838] bg-[#0d111a]/75 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-6 py-24">
-          <div className="mb-14 max-w-lg">
-            <p className="text-[#5EEAD4] font-mono text-sm">the pipeline</p>
-            <h2 className="text-3xl md:text-4xl font-display font-semibold mt-3 tracking-tight">
-              One URL becomes one assistant
+      {/* =========================================================
+          COMPARISON TABLE: TRADITIONAL VS AI BOT BUILDER
+      ========================================================= */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-28">
+        <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+          <span className="text-xs font-mono uppercase tracking-widest text-[#7C6CFF] bg-[#7C6CFF]/10 border border-[#7C6CFF]/20 px-3.5 py-1 rounded-full font-semibold">
+            The Difference
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+            Why AI Bot Builder wins
+          </h2>
+          <p className="text-sm sm:text-base text-[#8B91A4]">
+            Compare traditional brittle chatbot builders with our autonomous
+            RAG engine.
+          </p>
+        </div>
+
+        <div className="border border-white/15 bg-[#101322] rounded-3xl overflow-hidden shadow-2xl">
+          <div className="grid grid-cols-12 bg-[#0C0F1C] px-6 py-4 border-b border-white/[0.08] text-xs font-mono uppercase tracking-wider text-[#8B91A4]">
+            <div className="col-span-4 sm:col-span-5">Feature</div>
+            <div className="col-span-4 sm:col-span-3 text-red-400">
+              Legacy Chatbots
+            </div>
+            <div className="col-span-4 sm:col-span-4 text-[#5EEAD4] font-bold">
+              AI Bot Builder
+            </div>
+          </div>
+
+          <div className="divide-y divide-white/[0.06] text-xs sm:text-sm">
+            {[
+              {
+                feature: "Setup Process",
+                legacy: "Hours of manual decision trees",
+                modern: "Instant 30s automatic website crawl",
+              },
+              {
+                feature: "Knowledge Base",
+                legacy: "Fragile keyword matching",
+                modern: "768-D semantic vector RAG",
+              },
+              {
+                feature: "Response Speed",
+                legacy: "Static rule replies",
+                modern: "< 300ms Groq token streaming",
+              },
+              {
+                feature: "Maintenance",
+                legacy: "Re-edit trees on every product change",
+                modern: "1-Click Re-crawl sync",
+              },
+              {
+                feature: "Code Integration",
+                legacy: "Heavy SDKs and complex scripts",
+                modern: "1 clean lightweight script tag",
+              },
+            ].map((row, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-12 px-6 py-4 items-center hover:bg-white/[0.02] transition-colors"
+              >
+                <div className="col-span-4 sm:col-span-5 font-medium text-white">
+                  {row.feature}
+                </div>
+                <div className="col-span-4 sm:col-span-3 text-[#7C8296] text-xs">
+                  {row.legacy}
+                </div>
+                <div className="col-span-4 sm:col-span-4 text-[#5EEAD4] font-semibold text-xs flex items-center gap-1.5">
+                  <Check size={14} className="text-emerald-400 shrink-0" />
+                  <span>{row.modern}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================
+          FAQ ACCORDION SECTION
+      ========================================================= */}
+      <section id="faq" className="border-t border-white/[0.08] bg-[#0A0D18]/70 py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+            <span className="text-xs font-mono uppercase tracking-widest text-[#5EEAD4] bg-[#5EEAD4]/10 border border-[#5EEAD4]/20 px-3.5 py-1 rounded-full font-semibold">
+              Frequently Asked Questions
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Everything you need to know
             </h2>
+            <p className="text-sm sm:text-base text-[#8B91A4]">
+              Common questions about crawling, embeddings, privacy, and widget
+              embedding.
+            </p>
           </div>
 
-          <div className="relative grid md:grid-cols-3 gap-6">
-            <div className="hidden md:block absolute top-8 left-[16.5%] right-[16.5%] h-px bg-gradient-to-r from-[#5EEAD4]/40 via-[#5EEAD4]/40 to-[#5EEAD4]/40" />
-
-            <ThreadStep
-              icon={<Globe size={20} />}
-              tag="crawl"
-              title="Enter your website"
-              description="We fetch and read the pages that matter — no manual copy-paste."
-            />
-            <ThreadStep
-              icon={<Layers size={20} />}
-              tag="index"
-              title="Build the knowledge base"
-              description="Content is cleaned, chunked, and embedded for fast retrieval."
-            />
-            <ThreadStep
-              icon={<MessageSquare size={20} />}
-              tag="deploy"
-              title="Embed the widget"
-              description="Style it, drop in one script tag, and it's live on your site."
-            />
-          </div>
+          <FaqAccordion />
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="max-w-6xl mx-auto px-6 py-24">
-        <div className="mb-14 max-w-lg">
-          <p className="text-[#5EEAD4] font-mono text-sm">the platform</p>
-          <h2 className="text-3xl md:text-4xl font-display font-semibold mt-3 tracking-tight">
-            Everything to run your assistant
-          </h2>
-        </div>
+      {/* =========================================================
+          FINAL CALL TO ACTION BANNER
+      ========================================================= */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-28">
+        <div className="relative rounded-3xl border border-white/20 bg-gradient-to-b from-[#141829] to-[#0D101C] p-10 sm:p-20 text-center overflow-hidden shadow-[0_20px_70px_rgba(0,0,0,0.8)]">
+          {/* Ambient glow behind headline */}
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-[#7C6CFF]/30 via-[#5EEAD4]/20 to-[#FF6B4A]/25 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FeatureCard
-            icon={<Globe size={20} />}
-            title="Website analysis"
-            description="Automatically identify business info and products from your pages."
-          />
-          <FeatureCard
-            icon={<Database size={20} />}
-            title="Knowledge base"
-            description="Manage everything your assistant knows, beyond just the crawl."
-          />
-          <FeatureCard
-            icon={<BrainCircuit size={20} />}
-            title="RAG-powered answers"
-            description="Relevant knowledge is retrieved before every response is generated."
-          />
-          <FeatureCard
-            icon={<Bot size={20} />}
-            title="Bot customization"
-            description="Set identity, welcome message, colors, logo, and widget position."
-          />
-          <FeatureCard
-            icon={<MessageSquare size={20} />}
-            title="Conversation history"
-            description="See exactly what visitors ask, and how your assistant answers."
-          />
-          <FeatureCard
-            icon={<Sparkles size={20} />}
-            title="Embeddable widget"
-            description="One generated script tag installs the chatbot anywhere."
-          />
-        </div>
-      </section>
+          <span className="inline-block text-xs font-mono uppercase tracking-widest text-[#5EEAD4] bg-[#5EEAD4]/10 border border-[#5EEAD4]/20 px-3.5 py-1 rounded-full mb-6 font-semibold">
+            Get Started In Seconds
+          </span>
 
-      {/* CTA */}
-      <section className="max-w-5xl mx-auto px-6 pb-24">
-        <div className="rounded-2xl border border-[#232838] bg-[#12161F] p-10 md:p-14 text-center relative overflow-hidden">
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#5EEAD4]/10 blur-3xl rounded-full" />
-
-          <h2 className="text-3xl md:text-4xl font-display font-semibold tracking-tight relative">
-            Ready to build your assistant?
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white max-w-3xl mx-auto leading-tight">
+            Ready to give your website an intelligent voice?
           </h2>
 
-          <p className="text-[#8A93A6] mt-4 max-w-xl mx-auto relative">
-            Turn your website into a chatbot that knows what you know — no
-            training data to write by hand.
+          <p className="mt-4 text-[#8B91A4] text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+            Generate your first conversational assistant right now. No coding,
+            no manual training sets, and zero hassle.
           </p>
 
-          <button
-            onClick={startBuilding}
-            className="mt-8 bg-[#FF6B4A] hover:bg-[#ff7f5f] text-[#0B0E14] px-6 py-3.5 rounded-xl font-semibold inline-flex items-center gap-2 relative transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12161F]"
-          >
-            Get started
-            <ArrowRight size={18} />
-          </button>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => handleStart()}
+              className="w-full sm:w-auto bg-gradient-to-r from-[#FF6B4A] to-[#FF896B] hover:brightness-110 active:scale-95 text-[#07080D] px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-[#FF6B4A]/30 transition-all text-sm"
+            >
+              Build your AI bot
+              <ArrowRight size={17} />
+            </button>
+
+            {user && (
+              <Link
+                href="/dashboard"
+                className="w-full sm:w-auto border border-white/20 hover:border-white/40 text-white px-6 py-3.5 rounded-xl font-semibold transition-colors text-sm text-center"
+              >
+                Go to Dashboard
+              </Link>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="border-t border-[#232838]">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row gap-3 justify-between text-[#8A93A6] text-sm font-mono">
-          <span>AI Bot Builder</span>
-          <span>website content → conversational assistant</span>
+      {/* =========================================================
+          COMPREHENSIVE SAAS FOOTER
+      ========================================================= */}
+      <footer className="border-t border-white/[0.08] bg-[#070912] py-12 text-xs text-[#6F7588]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div>
+              <div className="flex items-center gap-2 text-white font-bold text-sm mb-3">
+                <Bot size={18} className="text-[#5EEAD4]" />
+                <span>AI Bot Builder</span>
+              </div>
+              <p className="leading-relaxed text-[#7C8296] text-xs">
+                Turn any website into a high-accuracy, sub-second streaming
+                conversational AI assistant.
+              </p>
+              <div className="mt-3 flex items-center gap-1.5 text-[11px] font-mono text-emerald-400">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                All Systems Operational
+              </div>
+            </div>
+
+            <div>
+              <p className="font-semibold text-white mb-3 text-xs uppercase tracking-wider">
+                Product
+              </p>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#how-it-works" className="hover:text-white transition-colors">
+                    How it works
+                  </a>
+                </li>
+                <li>
+                  <a href="#features" className="hover:text-white transition-colors">
+                    Platform Features
+                  </a>
+                </li>
+                <li>
+                  <a href="#demo" className="hover:text-white transition-colors">
+                    Live Sandbox
+                  </a>
+                </li>
+                <li>
+                  <a href="#embed-code" className="hover:text-white transition-colors">
+                    Integration Script
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-semibold text-white mb-3 text-xs uppercase tracking-wider">
+                Stack & Models
+              </p>
+              <ul className="space-y-2">
+                <li className="text-[#949AA8]">Groq LPU (Llama 3.3 70B)</li>
+                <li className="text-[#949AA8]">Gemini Embedding 004</li>
+                <li className="text-[#949AA8]">Supabase pgvector</li>
+                <li className="text-[#949AA8]">Next.js 16 App Router</li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-semibold text-white mb-3 text-xs uppercase tracking-wider">
+                Account
+              </p>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/login" className="hover:text-white transition-colors">
+                    Log in
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/signup" className="hover:text-white transition-colors">
+                    Sign up
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/dashboard" className="hover:text-white transition-colors">
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/create" className="hover:text-white transition-colors">
+                    Create New Bot
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-white/[0.06] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px]">
+            <p>© {new Date().getFullYear()} AI Bot Builder. All rights reserved.</p>
+            <div className="flex items-center gap-4 text-[#8B91A4]">
+              <span>Built with Next.js, Groq & Supabase</span>
+            </div>
+          </div>
         </div>
       </footer>
     </main>
   );
 }
-
-function ThreadStep({
-  icon,
-  tag,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  tag: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="relative bg-[#12161F] border border-[#232838] rounded-2xl p-6">
-      <div className="hidden md:block absolute -top-[2px] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#5EEAD4]" />
-
-      <div className="w-10 h-10 rounded-lg bg-[#5EEAD4]/10 text-[#5EEAD4] flex items-center justify-center">
-        {icon}
-      </div>
-
-      <p className="font-mono text-xs text-[#5EEAD4] mt-5">$ {tag}</p>
-
-      <h3 className="text-lg font-display font-semibold mt-2">{title}</h3>
-
-      <p className="text-[#8A93A6] mt-2.5 text-sm leading-relaxed">
-        {description}
-      </p>
-    </div>
-  );
-}
-
-function FeatureCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="border border-[#232838] bg-[#12161F] rounded-2xl p-6 hover:border-[#3a4257] transition-colors">
-      <div className="w-9 h-9 rounded-lg bg-[#5EEAD4]/10 text-[#5EEAD4] flex items-center justify-center">
-        {icon}
-      </div>
-
-      <h3 className="text-base font-display font-semibold mt-4">{title}</h3>
-
-      <p className="text-[#8A93A6] mt-2 text-sm leading-relaxed">
-        {description}
-      </p>
-    </div>
-  );
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { supabaseClient } from "@/lib/supabaseClient";
-// import {
-//   Bot,
-//   BrainCircuit,
-//   Globe,
-//   MessageSquare,
-//   ArrowRight,
-//   Database,
-//   Sparkles,
-//   ScanLine,
-//   Layers,
-// } from "lucide-react";
-
-// export default function LandingPage() {
-//   const router = useRouter();
-
-//   const [user, setUser] = useState<any>(null);
-//   const [loadingUser, setLoadingUser] = useState(true);
-
-//   useEffect(() => {
-//     async function loadUser() {
-//       const {
-//         data: { user },
-//       } = await supabaseClient.auth.getUser();
-
-//       setUser(user);
-//       setLoadingUser(false);
-//     }
-
-//     loadUser();
-//   }, []);
-
-//   function startBuilding() {
-//     if (user) {
-//       router.push("/create");
-//     } else {
-//       router.push("/login");
-//     }
-//   }
-
-//   async function handleLogout() {
-//     const { error } = await supabaseClient.auth.signOut();
-
-//     if (error) {
-//       console.error("Logout error:", error.message);
-//       alert("Logout failed. Please try again.");
-//       return;
-//     }
-
-//     setUser(null);
-//     router.refresh();
-//   }
-
-//   return (
-//     <main className="min-h-screen bg-[#0B0E14] text-[#EDEFF4] font-[Inter,sans-serif] selection:bg-[#5EEAD4]/30 selection:text-white">
-//       <style jsx global>{`
-//         @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
-
-//         .font-display {
-//           font-family: "Space Grotesk", sans-serif;
-//         }
-//         .font-mono {
-//           font-family: "JetBrains Mono", monospace;
-//         }
-
-//         @keyframes scanline {
-//           0% {
-//             top: 8%;
-//             opacity: 0;
-//           }
-//           8% {
-//             opacity: 1;
-//           }
-//           45% {
-//             opacity: 1;
-//           }
-//           55% {
-//             opacity: 0;
-//           }
-//           100% {
-//             top: 92%;
-//             opacity: 0;
-//           }
-//         }
-//         .scanline {
-//           animation: scanline 4.5s ease-in-out infinite;
-//         }
-
-//         @keyframes chip-in {
-//           from {
-//             opacity: 0;
-//             transform: translateY(6px);
-//           }
-//           to {
-//             opacity: 1;
-//             transform: translateY(0);
-//           }
-//         }
-//         .chip-1 {
-//           animation: chip-in 0.5s ease-out 0.6s both,
-//             chip-fade 4.5s ease-in-out infinite;
-//         }
-//         .chip-2 {
-//           animation: chip-in 0.5s ease-out 1.5s both,
-//             chip-fade 4.5s ease-in-out infinite;
-//         }
-//         .chip-3 {
-//           animation: chip-in 0.5s ease-out 2.4s both,
-//             chip-fade 4.5s ease-in-out infinite;
-//         }
-//         @keyframes chip-fade {
-//           0%,
-//           92% {
-//             opacity: 1;
-//           }
-//           97%,
-//           100% {
-//             opacity: 0;
-//           }
-//         }
-
-//         @keyframes typing-dot {
-//           0%,
-//           60%,
-//           100% {
-//             opacity: 0.25;
-//             transform: translateY(0);
-//           }
-//           30% {
-//             opacity: 1;
-//             transform: translateY(-2px);
-//           }
-//         }
-//         .dot-a {
-//           animation: typing-dot 1.2s ease-in-out infinite;
-//         }
-//         .dot-b {
-//           animation: typing-dot 1.2s ease-in-out infinite 0.15s;
-//         }
-//         .dot-c {
-//           animation: typing-dot 1.2s ease-in-out infinite 0.3s;
-//         }
-
-//         @keyframes bubble-in {
-//           0%,
-//           15% {
-//             opacity: 0;
-//             transform: translateY(8px) scale(0.96);
-//           }
-//           25%,
-//           90% {
-//             opacity: 1;
-//             transform: translateY(0) scale(1);
-//           }
-//           100% {
-//             opacity: 0;
-//             transform: translateY(8px) scale(0.96);
-//           }
-//         }
-//         .bubble-in {
-//           animation: bubble-in 4.5s ease-in-out infinite;
-//         }
-
-//         @media (prefers-reduced-motion: reduce) {
-//           .scanline,
-//           .chip-1,
-//           .chip-2,
-//           .chip-3,
-//           .dot-a,
-//           .dot-b,
-//           .dot-c,
-//           .bubble-in {
-//             animation: none !important;
-//             opacity: 1 !important;
-//           }
-//         }
-//       `}</style>
-
-//       {/* NAVBAR */}
-//       <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-//         <div
-//           className="flex items-center gap-2.5 cursor-pointer group"
-//           onClick={() => router.push("/")}
-//         >
-//           <div className="w-9 h-9 rounded-lg bg-[#5EEAD4] flex items-center justify-center text-[#0B0E14] group-hover:rotate-6 transition-transform">
-//             <Bot size={20} strokeWidth={2.4} />
-//           </div>
-//           <span className="text-lg font-display font-semibold tracking-tight">
-//             AI Bot Builder
-//           </span>
-//         </div>
-
-//         <div className="flex items-center gap-2">
-//           {!loadingUser && !user && (
-//             <>
-//               <button
-//                 onClick={() => router.push("/login")}
-//                 className="px-4 py-2.5 text-sm text-[#8A93A6] hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4] rounded-lg"
-//               >
-//                 Log in
-//               </button>
-
-//               <button
-//                 onClick={() => router.push("/signup")}
-//                 className="text-sm bg-[#EDEFF4] text-[#0B0E14] px-4 py-2.5 rounded-lg font-medium hover:bg-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0E14]"
-//               >
-//                 Create account
-//               </button>
-//             </>
-//           )}
-
-//           {!loadingUser && user && (
-//             <>
-//               <button
-//                 onClick={() => router.push("/dashboard")}
-//                 className="text-sm bg-[#EDEFF4] text-[#0B0E14] px-4 py-2.5 rounded-lg font-medium hover:bg-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0E14]"
-//               >
-//                 Dashboard
-//               </button>
-
-//               <button
-//                 onClick={handleLogout}
-//                 className="text-sm border border-[#232838] text-[#8A93A6] px-4 py-2.5 rounded-lg font-medium hover:border-[#3a4257] hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4]"
-//               >
-//                 Log out
-//               </button>
-//             </>
-//           )}
-//         </div>
-//       </nav>
-
-//       {/* HERO */}
-//       <section className="max-w-6xl mx-auto px-6 pt-16 pb-28 grid lg:grid-cols-2 gap-16 items-center">
-//         <div>
-//           <div className="inline-flex items-center gap-2 border border-[#232838] bg-[#12161F] px-3.5 py-1.5 rounded-full text-xs font-mono text-[#5EEAD4] mb-7">
-//             <ScanLine size={13} />
-//             url in, assistant out
-//           </div>
-
-//           <h1 className="text-4xl md:text-6xl font-display font-semibold tracking-tight leading-[1.08]">
-//             Your website already
-//             <span className="block text-[#5EEAD4] mt-1">
-//               knows the answers.
-//             </span>
-//           </h1>
-
-//           <p className="mt-6 text-lg text-[#8A93A6] max-w-lg leading-relaxed">
-//             Point it at a URL. We crawl the content, turn it into searchable
-//             knowledge, and hand you a chat assistant that actually knows your
-//             product — ready to embed anywhere.
-//           </p>
-
-//           <div className="mt-9 flex flex-col sm:flex-row gap-3">
-//             <button
-//               onClick={startBuilding}
-//               className="bg-[#FF6B4A] hover:bg-[#ff7f5f] text-[#0B0E14] px-6 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0E14]"
-//             >
-//               Build your AI bot
-//               <ArrowRight size={18} />
-//             </button>
-
-//             {user && (
-//               <button
-//                 onClick={() => router.push("/dashboard")}
-//                 className="border border-[#232838] hover:border-[#3a4257] px-6 py-3.5 rounded-xl font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5EEAD4]"
-//               >
-//                 View dashboard
-//               </button>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* SIGNATURE VISUAL: url -> scan -> chat */}
-//         <div className="relative">
-//           <div className="rounded-2xl border border-[#232838] bg-[#12161F] overflow-hidden shadow-[0_0_0_1px_rgba(94,234,212,0.04)]">
-//             <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[#232838]">
-//               <span className="w-2.5 h-2.5 rounded-full bg-[#3a4257]" />
-//               <span className="w-2.5 h-2.5 rounded-full bg-[#3a4257]" />
-//               <span className="w-2.5 h-2.5 rounded-full bg-[#3a4257]" />
-//               <span className="ml-3 font-mono text-xs text-[#8A93A6]">
-//                 your-company.com
-//               </span>
-//             </div>
-
-//             <div className="relative p-6 h-[280px] overflow-hidden">
-//               <div className="scanline absolute left-0 right-0 h-px bg-[#5EEAD4] shadow-[0_0_12px_2px_rgba(94,234,212,0.6)]" />
-
-//               <div className="space-y-2.5">
-//                 <div className="h-3 w-3/4 rounded bg-[#1c2231]" />
-//                 <div className="h-3 w-1/2 rounded bg-[#1c2231]" />
-//                 <div className="h-3 w-5/6 rounded bg-[#1c2231]" />
-//               </div>
-
-//               <div className="flex flex-wrap gap-2 mt-6">
-//                 <span className="chip-1 font-mono text-xs px-3 py-1.5 rounded-full bg-[#5EEAD4]/10 text-[#5EEAD4] border border-[#5EEAD4]/25">
-//                   Pricing
-//                 </span>
-//                 <span className="chip-2 font-mono text-xs px-3 py-1.5 rounded-full bg-[#5EEAD4]/10 text-[#5EEAD4] border border-[#5EEAD4]/25">
-//                   FAQ
-//                 </span>
-//                 <span className="chip-3 font-mono text-xs px-3 py-1.5 rounded-full bg-[#5EEAD4]/10 text-[#5EEAD4] border border-[#5EEAD4]/25">
-//                   Product docs
-//                 </span>
-//               </div>
-
-//               <div className="bubble-in absolute bottom-6 right-6 left-6 bg-[#0B0E14] border border-[#232838] rounded-xl rounded-br-sm p-4">
-//                 <div className="flex items-center gap-2 mb-2">
-//                   <div className="w-5 h-5 rounded-md bg-[#5EEAD4] flex items-center justify-center text-[#0B0E14]">
-//                     <Bot size={12} />
-//                   </div>
-//                   <span className="text-xs text-[#8A93A6] font-mono">
-//                     assistant
-//                   </span>
-//                 </div>
-//                 <div className="flex gap-1 items-end h-3">
-//                   <span className="dot-a w-1.5 h-1.5 rounded-full bg-[#8A93A6]" />
-//                   <span className="dot-b w-1.5 h-1.5 rounded-full bg-[#8A93A6]" />
-//                   <span className="dot-c w-1.5 h-1.5 rounded-full bg-[#8A93A6]" />
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-
-//           <div className="absolute -z-10 -inset-6 bg-[#5EEAD4]/5 blur-3xl rounded-full" />
-//         </div>
-//       </section>
-
-//       {/* HOW IT WORKS — connected thread, not numbered cards */}
-//       <section className="border-y border-[#232838] bg-[#0d111a]">
-//         <div className="max-w-6xl mx-auto px-6 py-24">
-//           <div className="mb-14 max-w-lg">
-//             <p className="text-[#5EEAD4] font-mono text-sm">the pipeline</p>
-//             <h2 className="text-3xl md:text-4xl font-display font-semibold mt-3 tracking-tight">
-//               One URL becomes one assistant
-//             </h2>
-//           </div>
-
-//           <div className="relative grid md:grid-cols-3 gap-6">
-//             <div className="hidden md:block absolute top-8 left-[16.5%] right-[16.5%] h-px bg-gradient-to-r from-[#5EEAD4]/40 via-[#5EEAD4]/40 to-[#5EEAD4]/40" />
-
-//             <ThreadStep
-//               icon={<Globe size={20} />}
-//               tag="crawl"
-//               title="Enter your website"
-//               description="We fetch and read the pages that matter — no manual copy-paste."
-//             />
-//             <ThreadStep
-//               icon={<Layers size={20} />}
-//               tag="index"
-//               title="Build the knowledge base"
-//               description="Content is cleaned, chunked, and embedded for fast retrieval."
-//             />
-//             <ThreadStep
-//               icon={<MessageSquare size={20} />}
-//               tag="deploy"
-//               title="Embed the widget"
-//               description="Style it, drop in one script tag, and it's live on your site."
-//             />
-//           </div>
-//         </div>
-//       </section>
-
-//       {/* FEATURES */}
-//       <section className="max-w-6xl mx-auto px-6 py-24">
-//         <div className="mb-14 max-w-lg">
-//           <p className="text-[#5EEAD4] font-mono text-sm">the platform</p>
-//           <h2 className="text-3xl md:text-4xl font-display font-semibold mt-3 tracking-tight">
-//             Everything to run your assistant
-//           </h2>
-//         </div>
-
-//         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-//           <FeatureCard
-//             icon={<Globe size={20} />}
-//             title="Website analysis"
-//             description="Automatically identify business info and products from your pages."
-//           />
-//           <FeatureCard
-//             icon={<Database size={20} />}
-//             title="Knowledge base"
-//             description="Manage everything your assistant knows, beyond just the crawl."
-//           />
-//           <FeatureCard
-//             icon={<BrainCircuit size={20} />}
-//             title="RAG-powered answers"
-//             description="Relevant knowledge is retrieved before every response is generated."
-//           />
-//           <FeatureCard
-//             icon={<Bot size={20} />}
-//             title="Bot customization"
-//             description="Set identity, welcome message, colors, logo, and widget position."
-//           />
-//           <FeatureCard
-//             icon={<MessageSquare size={20} />}
-//             title="Conversation history"
-//             description="See exactly what visitors ask, and how your assistant answers."
-//           />
-//           <FeatureCard
-//             icon={<Sparkles size={20} />}
-//             title="Embeddable widget"
-//             description="One generated script tag installs the chatbot anywhere."
-//           />
-//         </div>
-//       </section>
-
-//       {/* CTA */}
-//       <section className="max-w-5xl mx-auto px-6 pb-24">
-//         <div className="rounded-2xl border border-[#232838] bg-[#12161F] p-10 md:p-14 text-center relative overflow-hidden">
-//           <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#5EEAD4]/10 blur-3xl rounded-full" />
-
-//           <h2 className="text-3xl md:text-4xl font-display font-semibold tracking-tight relative">
-//             Ready to build your assistant?
-//           </h2>
-
-//           <p className="text-[#8A93A6] mt-4 max-w-xl mx-auto relative">
-//             Turn your website into a chatbot that knows what you know — no
-//             training data to write by hand.
-//           </p>
-
-//           <button
-//             onClick={startBuilding}
-//             className="mt-8 bg-[#FF6B4A] hover:bg-[#ff7f5f] text-[#0B0E14] px-6 py-3.5 rounded-xl font-semibold inline-flex items-center gap-2 relative transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B4A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#12161F]"
-//           >
-//             Get started
-//             <ArrowRight size={18} />
-//           </button>
-//         </div>
-//       </section>
-
-//       {/* FOOTER */}
-//       <footer className="border-t border-[#232838]">
-//         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row gap-3 justify-between text-[#8A93A6] text-sm font-mono">
-//           <span>AI Bot Builder</span>
-//           <span>website content → conversational assistant</span>
-//         </div>
-//       </footer>
-//     </main>
-//   );
-// }
-
-// function ThreadStep({
-//   icon,
-//   tag,
-//   title,
-//   description,
-// }: {
-//   icon: React.ReactNode;
-//   tag: string;
-//   title: string;
-//   description: string;
-// }) {
-//   return (
-//     <div className="relative bg-[#12161F] border border-[#232838] rounded-2xl p-6">
-//       <div className="hidden md:block absolute -top-[2px] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#5EEAD4]" />
-
-//       <div className="w-10 h-10 rounded-lg bg-[#5EEAD4]/10 text-[#5EEAD4] flex items-center justify-center">
-//         {icon}
-//       </div>
-
-//       <p className="font-mono text-xs text-[#5EEAD4] mt-5">$ {tag}</p>
-
-//       <h3 className="text-lg font-display font-semibold mt-2">{title}</h3>
-
-//       <p className="text-[#8A93A6] mt-2.5 text-sm leading-relaxed">
-//         {description}
-//       </p>
-//     </div>
-//   );
-// }
-
-// function FeatureCard({
-//   icon,
-//   title,
-//   description,
-// }: {
-//   icon: React.ReactNode;
-//   title: string;
-//   description: string;
-// }) {
-//   return (
-//     <div className="border border-[#232838] bg-[#12161F] rounded-2xl p-6 hover:border-[#3a4257] transition-colors">
-//       <div className="w-9 h-9 rounded-lg bg-[#5EEAD4]/10 text-[#5EEAD4] flex items-center justify-center">
-//         {icon}
-//       </div>
-
-//       <h3 className="text-base font-display font-semibold mt-4">{title}</h3>
-
-//       <p className="text-[#8A93A6] mt-2 text-sm leading-relaxed">
-//         {description}
-//       </p>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { supabaseClient } from "@/lib/supabaseClient";
-// import {
-//   Bot,
-//   BrainCircuit,
-//   Globe,
-//   MessageSquare,
-//   ArrowRight,
-//   Database,
-// } from "lucide-react";
-
-// export default function LandingPage() {
-//   const router = useRouter();
-
-//   const [user, setUser] = useState<any>(null);
-//   const [loadingUser, setLoadingUser] = useState(true);
-
-//   useEffect(() => {
-//     async function loadUser() {
-//       const {
-//         data: { user },
-//       } = await supabaseClient.auth.getUser();
-
-//       setUser(user);
-//       setLoadingUser(false);
-//     }
-
-//     loadUser();
-//   }, []);
-
-//   function startBuilding() {
-//     if (user) {
-//       router.push("/create");
-//     } else {
-//       router.push("/login");
-//     }
-//   }
-//   async function handleLogout() {
-//   const { error } = await supabaseClient.auth.signOut();
-
-//   if (error) {
-//     console.error("Logout error:", error.message);
-//     alert("Logout failed. Please try again.");
-//     return;
-//   }
-
-//   setUser(null);
-//   router.refresh();
-// }
-
-//   return (
-//     <main className="min-h-screen bg-zinc-950 text-white">
-
-//       {/* NAVBAR */}
-
-//       <nav className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-
-//         <div
-//           className="flex items-center gap-3 cursor-pointer"
-//           onClick={() => router.push("/")}
-//         >
-//           <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
-//             <Bot size={24} />
-//           </div>
-
-//           <span className="text-xl font-bold">
-//             AI Bot Builder
-//           </span>
-//         </div>
-
-//         <div className="flex items-center gap-3">
-
-//           {!loadingUser && !user && (
-//             <>
-//               <button
-//                 onClick={() => router.push("/login")}
-//                 className="px-5 py-2.5 text-zinc-300 hover:text-white"
-//               >
-//                 Login
-//               </button>
-
-//               <button
-//                 onClick={() => router.push("/signup")}
-//                 className="bg-white text-black px-5 py-2.5 rounded-lg font-medium hover:bg-zinc-200"
-//               >
-//                 Create Account
-//               </button>
-//             </>
-//           )}
-
-//           {!loadingUser && user && (
-//   <>
-//     <button
-//       onClick={() => router.push("/dashboard")}
-//       className="bg-white text-black px-5 py-2.5 rounded-lg font-medium hover:bg-zinc-200"
-//     >
-//       Dashboard
-//     </button>
-
-//     <button
-//       onClick={handleLogout}
-//       className="border border-zinc-700 text-zinc-300 px-5 py-2.5 rounded-lg font-medium hover:bg-zinc-900 hover:text-white"
-//     >
-//       Logout
-//     </button>
-//   </>
-// )}
-          
-
-//         </div>
-//       </nav>
-
-
-//       {/* HERO */}
-
-//       <section className="max-w-6xl mx-auto px-6 pt-24 pb-28 text-center">
-
-//         <div className="inline-flex items-center gap-2 border border-zinc-700 bg-zinc-900 px-4 py-2 rounded-full text-sm text-zinc-300 mb-8">
-//           <BrainCircuit size={16} />
-//           AI-powered website assistants
-//         </div>
-
-//         <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight">
-
-//           Turn Any Website Into an
-
-//           <span className="block text-blue-500 mt-2">
-//             Intelligent AI Assistant
-//           </span>
-
-//         </h1>
-
-//         <p className="mt-7 text-lg md:text-xl text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-//           Enter a website URL and automatically create an AI chatbot
-//           trained on its content. Customize it, manage its knowledge,
-//           track conversations, and embed it on any website.
-//         </p>
-
-//         <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-
-//           <button
-//             onClick={startBuilding}
-//             className="bg-blue-600 hover:bg-blue-700 px-7 py-4 rounded-xl font-semibold flex items-center justify-center gap-2"
-//           >
-//             Build Your AI Bot
-//             <ArrowRight size={19} />
-//           </button>
-
-//           {user && (
-//             <button
-//               onClick={() => router.push("/dashboard")}
-//               className="border border-zinc-700 hover:bg-zinc-900 px-7 py-4 rounded-xl font-semibold"
-//             >
-//               View Dashboard
-//             </button>
-//           )}
-
-//         </div>
-
-//       </section>
-
-
-//       {/* HOW IT WORKS */}
-
-//       <section className="border-y border-zinc-800 bg-zinc-900/40">
-
-//         <div className="max-w-7xl mx-auto px-6 py-24">
-
-//           <div className="text-center mb-14">
-
-//             <p className="text-blue-500 font-semibold">
-//               SIMPLE WORKFLOW
-//             </p>
-
-//             <h2 className="text-4xl font-bold mt-3">
-//               From website to AI assistant
-//             </h2>
-
-//             <p className="text-zinc-400 mt-4">
-//               Create a website-aware chatbot in three simple steps.
-//             </p>
-
-//           </div>
-
-//           <div className="grid md:grid-cols-3 gap-6">
-
-//             <StepCard
-//               number="01"
-//               icon={<Globe size={26} />}
-//               title="Enter Your Website"
-//               description="Provide your website URL. The system crawls and processes relevant website content."
-//             />
-
-//             <StepCard
-//               number="02"
-//               icon={<BrainCircuit size={26} />}
-//               title="Build AI Knowledge"
-//               description="Website content is cleaned, chunked and transformed into searchable AI knowledge."
-//             />
-
-//             <StepCard
-//               number="03"
-//               icon={<MessageSquare size={26} />}
-//               title="Deploy Your Bot"
-//               description="Customize your assistant and add the generated widget script to your website."
-//             />
-
-//           </div>
-
-//         </div>
-
-//       </section>
-
-
-//       {/* FEATURES */}
-
-//       <section className="max-w-7xl mx-auto px-6 py-24">
-
-//         <div className="text-center mb-14">
-
-//           <p className="text-blue-500 font-semibold">
-//             PLATFORM FEATURES
-//           </p>
-
-//           <h2 className="text-4xl font-bold mt-3">
-//             Everything you need to manage your AI assistant
-//           </h2>
-
-//         </div>
-
-//         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-//           <FeatureCard
-//             icon={<Globe size={24} />}
-//             title="Website Analysis"
-//             description="Analyze website content and automatically identify business information and products."
-//           />
-
-//           <FeatureCard
-//             icon={<Database size={24} />}
-//             title="Knowledge Base"
-//             description="Manage website knowledge and additional information used by your AI assistant."
-//           />
-
-//           <FeatureCard
-//             icon={<BrainCircuit size={24} />}
-//             title="RAG-Powered Answers"
-//             description="Retrieve relevant website knowledge before generating contextual chatbot responses."
-//           />
-
-//           <FeatureCard
-//             icon={<Bot size={24} />}
-//             title="Bot Customization"
-//             description="Customize bot identity, welcome message, colors, logo, position and appearance."
-//           />
-
-//           <FeatureCard
-//             icon={<MessageSquare size={24} />}
-//             title="Conversation History"
-//             description="Review visitor conversations and understand the questions people ask your assistant."
-//           />
-
-//           <FeatureCard
-//             icon={<ArrowRight size={24} />}
-//             title="Embeddable Widget"
-//             description="Install the chatbot on another website using a simple generated script."
-//           />
-
-//         </div>
-
-//       </section>
-
-
-//       {/* CTA */}
-
-//       <section className="max-w-5xl mx-auto px-6 pb-24">
-
-//         <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-10 md:p-16 text-center">
-
-//           <h2 className="text-4xl font-bold">
-//             Ready to build your AI assistant?
-//           </h2>
-
-//           <p className="text-zinc-400 mt-4 max-w-xl mx-auto">
-//             Turn website content into a useful conversational assistant
-//             and manage everything from one dashboard.
-//           </p>
-
-//           <button
-//             onClick={startBuilding}
-//             className="mt-8 bg-blue-600 hover:bg-blue-700 px-7 py-4 rounded-xl font-semibold inline-flex items-center gap-2"
-//           >
-//             Get Started
-//             <ArrowRight size={19} />
-//           </button>
-
-//         </div>
-
-//       </section>
-
-
-//       {/* FOOTER */}
-
-//       <footer className="border-t border-zinc-800">
-
-//         <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row gap-4 justify-between text-zinc-500 text-sm">
-
-//           <span>
-//             AI Bot Builder
-//           </span>
-
-//           <span>
-//             AI-powered website assistant platform
-//           </span>
-
-//         </div>
-
-//       </footer>
-
-//     </main>
-//   );
-// }
-
-
-// function StepCard({
-//   number,
-//   icon,
-//   title,
-//   description,
-// }: {
-//   number: string;
-//   icon: React.ReactNode;
-//   title: string;
-//   description: string;
-// }) {
-//   return (
-//     <div className="border border-zinc-800 bg-zinc-950 rounded-2xl p-7">
-
-//       <div className="flex justify-between items-start">
-
-//         <div className="w-12 h-12 bg-blue-600/15 text-blue-500 rounded-xl flex items-center justify-center">
-//           {icon}
-//         </div>
-
-//         <span className="text-zinc-700 text-3xl font-bold">
-//           {number}
-//         </span>
-
-//       </div>
-
-//       <h3 className="text-xl font-bold mt-6">
-//         {title}
-//       </h3>
-
-//       <p className="text-zinc-400 mt-3 leading-relaxed">
-//         {description}
-//       </p>
-
-//     </div>
-//   );
-// }
-
-
-// function FeatureCard({
-//   icon,
-//   title,
-//   description,
-// }: {
-//   icon: React.ReactNode;
-//   title: string;
-//   description: string;
-// }) {
-//   return (
-//     <div className="border border-zinc-800 bg-zinc-900/50 rounded-2xl p-7 hover:border-zinc-700 transition">
-
-//       <div className="w-11 h-11 bg-blue-600/15 text-blue-500 rounded-xl flex items-center justify-center">
-//         {icon}
-//       </div>
-
-//       <h3 className="text-xl font-bold mt-5">
-//         {title}
-//       </h3>
-
-//       <p className="text-zinc-400 mt-3 leading-relaxed">
-//         {description}
-//       </p>
-
-//     </div>
-//   );
-// }

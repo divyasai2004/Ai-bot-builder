@@ -42,20 +42,20 @@ export default function ChatWidget({
   if (!isOpen) {
     return (
       <button
-  onClick={() => setIsOpen(true)}
-  className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-16 h-16 rounded-full shadow-2xl text-2xl transition hover:scale-110"
->
-  💬
-</button>
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-2xl text-2xl transition hover:scale-110 z-50 flex items-center justify-center"
+        aria-label="Open chat"
+      >
+        💬
+      </button>
     );
   }
 
   return (
-<div className="fixed bottom-5 right-5 w-[370px] max-w-[95vw] h-[600px] max-h-[85vh] bg-zinc-900 text-white border border-zinc-700 rounded-xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300">
+    <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 w-[calc(100vw-1.5rem)] sm:w-[370px] max-h-[85vh] h-[580px] bg-zinc-900 text-white border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 z-50">
       {/* Header */}
-<div className="bg-zinc-900 px-5 py-4 flex justify-between items-center border-b border-zinc-700">       
-<span className="font-bold text-lg">          💬 {botName}
-        </span>
+      <div className="bg-zinc-900 px-4 sm:px-5 py-3.5 sm:py-4 flex justify-between items-center border-b border-zinc-700 shrink-0">
+        <span className="font-bold text-base sm:text-lg truncate">💬 {botName}</span>
 
         <button
           onClick={() => setIsOpen(false)}
@@ -78,7 +78,7 @@ export default function ChatWidget({
           >
             <div
 
-  className={`max-w-[82%] px-4 py-3 rounded-2xl text-sm leading-6 shadow ${                
+  className={`max-w-[82%] px-4 py-3 rounded-2xl text-sm leading-6 shadow ${
     msg.sender === "user"
   ? "bg-blue-600 text-white rounded-br-md"
   : "bg-zinc-800 text-zinc-100 rounded-bl-md"

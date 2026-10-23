@@ -40,6 +40,12 @@ export default function DashboardLayout({
       icon: Bot,
     },
     {
+      title: "Playground",
+      description: "Test & live chat",
+      href: `/playground/${botId}`,
+      icon: Sparkles,
+    },
+    {
       title: "Knowledge Base",
       description: "Manage bot knowledge",
       href: `/dashboard/${botId}/knowledge`,
@@ -130,7 +136,7 @@ export default function DashboardLayout({
 
           ${
             sidebarOpen
-              ? "translate-x-0 top-16"
+              ? "translate-x-0 top-16 lg:top-0"
               : "-translate-x-full lg:top-0"
           }
         `}
@@ -326,107 +332,3 @@ export default function DashboardLayout({
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import Link from "next/link";
-// import {
-//   useParams,
-//   usePathname,
-// } from "next/navigation";
-
-// export default function DashboardLayout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   const params = useParams();
-//   const pathname = usePathname();
-
-//   const botId = params.id as string;
-
-//   const menus = [
-//     {
-//       title: "Bot Settings",
-//       href: `/dashboard/${botId}`,
-//       icon: "🤖",
-//     },
-//     {
-//       title: "Knowledge Base",
-//       href: `/dashboard/${botId}/knowledge`,
-//       icon: "📚",
-//     },
-//     {
-//       title: "Analytics",
-//       href: `/dashboard/${botId}/analytics`,
-//       icon: "📊",
-//     },
-//     {
-//       title: "Conversations",
-//       href: `/dashboard/${botId}/conversations`,
-//       icon: "💬",
-//     },
-//   ];
-
-//   return (
-//     <div className="min-h-screen flex">
-
-//       <aside className="w-72 bg-black text-white p-6">
-
-//         <h1 className="text-2xl font-bold mb-6">
-//           AI Bot Builder
-//         </h1>
-
-//         <Link
-//           href="/dashboard"
-//           className="block w-full bg-white text-black px-4 py-3 rounded-lg mb-8 font-semibold hover:bg-gray-200 transition"
-//         >
-//           ← Dashboard
-//         </Link>
-
-//         <nav className="space-y-2">
-
-//           {menus.map((menu) => {
-
-//             const isActive =
-//               pathname === menu.href;
-
-//             return (
-//               <Link
-//                 key={menu.href}
-//                 href={menu.href}
-//                 className={`block px-4 py-3 rounded-lg transition ${
-//                   isActive
-//                     ? "bg-blue-600"
-//                     : "hover:bg-gray-800"
-//                 }`}
-//               >
-//                 <span className="mr-2">
-//                   {menu.icon}
-//                 </span>
-
-//                 {menu.title}
-//               </Link>
-//             );
-//           })}
-
-//         </nav>
-
-//       </aside>
-
-//       <main className="flex-1 bg-gray-100 min-w-0">
-//         {children}
-//       </main>
-
-//     </div>
-//   );
-// }

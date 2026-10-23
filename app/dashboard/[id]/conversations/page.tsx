@@ -16,6 +16,7 @@ import {
   Clock3,
   MessagesSquare,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 
 interface Chat {
@@ -49,6 +50,8 @@ export default function ConversationsPage() {
   selectedConversationId,
   setSelectedConversationId,
 ] = useState<string>("");
+
+  const [mobileView, setMobileView] = useState<"list" | "chat">("list");
 
   const [search, setSearch] =
     useState("");
@@ -276,19 +279,18 @@ const conversations =
   }
 
   return (
-    <main className="p-6 md:p-10">
+    <main className="p-4 sm:p-6 md:p-8">
 
       {/* HEADER */}
 
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
 
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-950 md:text-4xl">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 md:text-4xl">
           Conversations
         </h1>
 
-        <p className="mt-2 text-zinc-500">
-          Review conversations between
-          visitors and your AI assistant.
+        <p className="mt-1.5 sm:mt-2 text-sm text-zinc-500">
+          Review conversations between visitors and your AI assistant.
         </p>
 
       </div>
@@ -296,7 +298,7 @@ const conversations =
 
       {/* STATS */}
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2">
+      <div className="mb-6 sm:mb-8 grid gap-4 sm:grid-cols-2">
 
         <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
 
@@ -360,9 +362,8 @@ const conversations =
             No conversations yet
           </h2>
 
-          <p className="mt-2 max-w-md text-zinc-500">
-            Conversations will appear here
-            after visitors start chatting with
+          <p className="mt-2 max-w-md text-zinc-500 text-sm">
+            Conversations will appear here after visitors start chatting with
             your embedded AI assistant.
           </p>
 
@@ -374,7 +375,7 @@ const conversations =
 
           {/* LEFT PANEL */}
 
-          <aside className="border-b border-zinc-200 lg:border-b-0 lg:border-r">
+          <aside className={`border-b border-zinc-200 lg:border-b-0 lg:border-r ${mobileView === "chat" ? "hidden lg:block" : "block"}`}>
 
             <div className="border-b border-zinc-200 p-4">
 
@@ -393,7 +394,7 @@ const conversations =
                     )
                   }
                   placeholder="Search conversations..."
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-blue-500 focus:bg-white"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 sm:py-3 pl-10 pr-4 text-sm outline-none transition focus:border-blue-500 focus:bg-white"
                 />
 
               </div>
@@ -418,13 +419,11 @@ const conversations =
 
                   return (
                     <button
-                      key={  conversation.conversationId
-}
-                      onClick={() =>
-  setSelectedConversationId(
-    conversation.conversationId
-  )
-}
+                      key={conversation.conversationId}
+                      onClick={() => {
+                        setSelectedConversationId(conversation.conversationId);
+                        setMobileView("chat");
+                      }}
                       className={`w-full border-b border-zinc-100 p-4 text-left transition ${
                         selected
                           ? "bg-blue-50"
@@ -513,30 +512,39 @@ const conversations =
 
           {/* RIGHT PANEL */}
 
-          <section className="flex min-h-[650px] flex-col">
+          <section className={`flex min-h-[650px] flex-col ${mobileView === "list" ? "hidden lg:flex" : "flex"}`}>
 
             {activeConversation ? (
               <>
 
                 {/* CHAT HEADER */}
 
-                <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+                <div className="flex items-center justify-between border-b border-zinc-200 px-4 sm:px-5 py-4 gap-2">
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
 
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
+                    <button
+                      onClick={() => setMobileView("list")}
+                      className="lg:hidden flex items-center gap-1 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg shrink-0 transition"
+                      aria-label="Back to conversations list"
+                    >
+                      <ArrowLeft size={14} />
+                      <span>Back</span>
+                    </button>
+
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white">
                       <UserRound
                         size={18}
                       />
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
 
-                      <p className="font-semibold text-zinc-950">
+                      <p className="font-semibold text-zinc-950 text-sm sm:text-base">
                             Conversation
                       </p>
 
-                      <p className="max-w-[220px] truncate font-mono text-xs text-zinc-400 md:max-w-md">
+                      <p className="max-w-[180px] sm:max-w-md truncate font-mono text-xs text-zinc-400">
                         {
                           activeConversation.visitorId
                         }
@@ -547,7 +555,7 @@ const conversations =
                   </div>
 
 
-                  <div className="hidden items-center gap-1.5 text-xs text-zinc-400 sm:flex">
+                  <div className="hidden items-center gap-1.5 text-xs text-zinc-400 sm:flex shrink-0">
 
                     <Clock3 size={14} />
 

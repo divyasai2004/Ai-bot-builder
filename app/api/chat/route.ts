@@ -6,6 +6,7 @@ import { searchRelevantChunks } from "../../../lib/rag";
 import { saveChat } from "../../../lib/chatService";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { chatRateLimit } from "@/lib/rateLimiter";
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 
 // ==========================================================
 // CORS
@@ -33,6 +34,7 @@ interface ChatRequestBody {
   visitorId?: unknown;
   conversationId?: unknown;
   history?: unknown;
+  preview?: unknown;
 }
 
 // ==========================================================
@@ -254,36 +256,40 @@ const identifier = createRateLimitIdentifier(
   visitorId
 );
 
-const {
-  success,
-  remaining,
-  reset,
-} = await chatRateLimit.limit(identifier);
+    try {
+      const {
+        success,
+        remaining,
+        reset,
+      } = await chatRateLimit.limit(identifier);
 
-if (!success) {
-  return NextResponse.json(
-    {
-      success: false,
-      error:
-        "Too many requests. Please wait before sending another message.",
-    },
-    {
-      status: 429,
-      headers: {
-        ...corsHeaders,
-        "Retry-After": String(
-          Math.max(
-            1,
-            Math.ceil((reset - Date.now()) / 1000)
-          )
-        ),
-        "X-RateLimit-Remaining": String(
-          remaining
-        ),
-      },
+      if (!success) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Too many requests. Please wait before sending another message.",
+          },
+          {
+            status: 429,
+            headers: {
+              ...corsHeaders,
+              "Retry-After": String(
+                Math.max(
+                  1,
+                  Math.ceil((reset - Date.now()) / 1000)
+                )
+              ),
+              "X-RateLimit-Remaining": String(
+                remaining
+              ),
+            },
+          }
+        );
+      }
+    } catch (rlError) {
+      console.warn("Rate limit check bypassed due to error:", rlError);
     }
-  );
-}
 
 console.log("========== CHAT REQUEST ==========");
 console.log("QUESTION:", question);
@@ -331,7 +337,37 @@ console.log("CLIENT:", identifier);
     // 6. CHECK ACTIVE STATUS
     // ======================================================
 
-    if (!bot.is_active) {
+    const isPreview = body.preview === true;
+
+    if (isPreview) {
+      const supabase = await createSupabaseServerClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        return NextResponse.json(
+          { success: false, error: "Unauthorized preview request." },
+          { status: 401, headers: corsHeaders }
+        );
+      }
+
+      const { data: ownedBot } = await supabaseAdmin
+        .from("websites")
+        .select("id")
+        .eq("id", websiteId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!ownedBot) {
+        return NextResponse.json(
+          { success: false, error: "Bot not found or access denied." },
+          { status: 404, headers: corsHeaders }
+        );
+      }
+    }
+
+    if (!bot.is_active && !isPreview) {
       console.log(
         "CHAT BLOCKED: BOT IS PAUSED"
       );
@@ -417,7 +453,7 @@ console.log("CLIENT:", identifier);
         .slice(0, 2)
         .map(
           (
-            chunk: any,
+            chunk: { chunk_text?: string | null },
             index: number
           ) => `
 Context ${index + 1}

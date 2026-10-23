@@ -95,6 +95,14 @@ export default function Home() {
   // ---------------------------------------
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const initialUrl = params.get("url");
+      if (initialUrl) {
+        setUrl(initialUrl);
+      }
+    }
+
     async function loadUser() {
       const {
         data: { user },
@@ -238,7 +246,14 @@ export default function Home() {
       });
 
       if (!res.ok) {
-        throw new Error("Chat request failed");
+        let errorMsg = "Chat request failed";
+        try {
+          const errData = await res.json();
+          if (errData?.error) errorMsg = errData.error;
+        } catch {
+          // not json
+        }
+        throw new Error(errorMsg);
       }
 
       if (!res.body) {
@@ -282,7 +297,7 @@ export default function Home() {
           content: answer,
         },
       ]);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
 
       setMessages((prev) => {
@@ -290,7 +305,7 @@ export default function Home() {
 
         updated[updated.length - 1] = {
           sender: "bot",
-          text: "Sorry, I couldn't process your request.",
+          text: error?.message || "Sorry, I couldn't process your request.",
         };
 
         return updated;
