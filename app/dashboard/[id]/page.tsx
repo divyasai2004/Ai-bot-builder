@@ -31,13 +31,32 @@ import Link from "next/link";
 
 import WidgetPreview from "@/components/WidgetPreview";
 
+interface WebsiteSettings {
+  id: string;
+  website_url: string;
+  bot_name: string;
+  welcome_message: string;
+  theme: string;
+  suggested_questions: string[];
+  primary_color: string;
+  header_color: string;
+  widget_position: string;
+  widget_width: number;
+  border_radius: number;
+  logo_url: string | null;
+  is_active: boolean;
+  industry?: string | null;
+  business_type?: string | null;
+  products?: unknown[];
+  website_content?: string;
+}
 
 export default function WebsitePage() {
 
   const params = useParams();
 
   const [site, setSite] =
-    useState<any>(null);
+    useState<WebsiteSettings | null>(null);
 
   const [loading, setLoading] =
     useState(true);
@@ -181,17 +200,17 @@ export default function WebsitePage() {
       );
     }
 
-    setSite((prev: any) => ({
+    setSite((prev) => prev ? ({
       ...prev,
       ...payload,
-    }));
+    }) : prev);
 
     alert("Bot updated successfully!");
-  } catch (error: any) {
+  } catch (error) {
     console.error("SAVE ERROR:", error);
 
     alert(
-      error.message ||
+      (error instanceof Error ? error.message : null) ||
         "Could not save changes."
     );
   } finally {
@@ -852,10 +871,10 @@ data-bot-id="${site?.id}">
                         src={site.logo_url}
                         alt="Bot logo"
                         onError={() => {
-                          setSite((prev: any) => ({
+                          setSite((prev) => prev ? ({
                             ...prev,
                             logo_url: null,
-                          }));
+                          }) : prev);
                         }}
                         className="
                           w-full
@@ -946,10 +965,10 @@ data-bot-id="${site?.id}">
                             }
 
                             // 1. Update local state
-                            setSite((prev: any) => ({
+                            setSite((prev) => prev ? ({
                               ...prev,
                               logo_url: data.url,
-                            }));
+                            }) : prev);
 
                             // 2. Immediately persist to database so it isn't lost if user navigates
                             const updatedQuestions = questionsText
@@ -982,9 +1001,9 @@ data-bot-id="${site?.id}">
                               setLogoNotice("Logo uploaded and saved successfully!");
                               setTimeout(() => setLogoNotice(null), 4000);
                             }
-                          } catch (err: any) {
+                          } catch (err) {
                             console.error("Upload logo error:", err);
-                            alert(err?.message || "Failed to upload image. Please try again.");
+                            alert(err instanceof Error ? err.message : "Failed to upload image. Please try again.");
                           } finally {
                             target.value = "";
                             setUploadingLogo(false);
@@ -1002,10 +1021,10 @@ data-bot-id="${site?.id}">
                           const ok = confirm("Are you sure you want to remove the bot logo?");
                           if (!ok) return;
 
-                          setSite((prev: any) => ({
+                          setSite((prev) => prev ? ({
                             ...prev,
                             logo_url: null,
-                          }));
+                          }) : prev);
 
                           try {
                             const updatedQuestions = questionsText
@@ -1197,11 +1216,11 @@ How can I contact support?`}
                   type="button"
                   onClick={() =>
                     setSite(
-                      (prev: any) => ({
+                      (prev) => prev ? ({
                         ...prev,
                         is_active:
                           !prev.is_active,
-                      })
+                      }) : prev
                     )
                   }
                   className={`
@@ -1519,7 +1538,7 @@ How can I contact support?`}
                   welcomeMessage={
                     site.welcome_message
                   }
-                  logoUrl={site.logo_url}
+                  logoUrl={site.logo_url ?? undefined}
                   theme={site.theme}
                   primaryColor={
                     site.primary_color ||

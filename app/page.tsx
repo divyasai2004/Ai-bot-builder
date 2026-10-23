@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabaseClient";
+import type { User } from "@supabase/supabase-js";
 import {
   Bot,
   Globe,
@@ -112,9 +113,11 @@ function FloatingBotMascot() {
     }
 
     if (deleting && text === "") {
-      setDeleting(false);
-      setPhraseIndex((prev) => (prev + 1) % phrases.length);
-      return;
+      const nextPhraseTimeout = setTimeout(() => {
+        setDeleting(false);
+        setPhraseIndex((prev) => (prev + 1) % phrases.length);
+      }, 0);
+      return () => clearTimeout(nextPhraseTimeout);
     }
 
     const timeout = setTimeout(() => {
@@ -658,7 +661,7 @@ function FaqAccordion() {
 export default function LandingPage() {
   const router = useRouter();
 
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [inputUrl, setInputUrl] = useState("");
   const [activeTheme, setActiveTheme] = useState<

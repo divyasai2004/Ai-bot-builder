@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   Bot,
@@ -10,22 +10,20 @@ import {
 } from "lucide-react";
 
 export default function TestWidgetPage() {
-  const [botId, setBotId] = useState("");
+  const botId = useSyncExternalStore(
+    () => () => {},
+    () => new URLSearchParams(window.location.search).get("botId") || "",
+    () => ""
+  );
   const [scriptLoaded, setScriptLoaded] =
     useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(
-      window.location.search
-    );
-
-    const id = params.get("botId");
+    const id = botId;
 
     if (!id) {
       return;
     }
-
-    setBotId(id);
 
     // Remove an old test widget if the component
     // remounts during development.
@@ -60,7 +58,7 @@ export default function TestWidgetPage() {
     return () => {
       script.remove();
     };
-  }, []);
+  }, [botId]);
 
   if (!botId) {
     return (

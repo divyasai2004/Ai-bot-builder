@@ -93,12 +93,11 @@ export default function ConversationsPage() {
 
         setChats(loadedChats);
 
-      } catch (error: any) {
+      } catch (error) {
         console.error(error);
 
         setError(
-          error?.message ||
-            "Failed to load conversations."
+          error instanceof Error ? error.message : "Failed to load conversations."
         );
       } finally {
         setLoading(false);
@@ -187,20 +186,6 @@ const conversations =
       );
   }, [chats]);
 
-  useEffect(() => {
-  if (
-    conversations.length > 0 &&
-    !selectedConversationId
-  ) {
-    setSelectedConversationId(
-      conversations[0].conversationId
-    );
-  }
-}, [
-  conversations,
-  selectedConversationId,
-]);
-
   // ==========================================
   // SEARCH
   // ==========================================
@@ -240,7 +225,7 @@ const conversations =
   conversations.find(
     (conversation) =>
       conversation.conversationId ===
-      selectedConversationId
+      selectedConversationId || conversations[0]?.conversationId
   );
 
   // ==========================================
@@ -408,7 +393,7 @@ const conversations =
                 (conversation) => {
 
                   const selected =
-  selectedConversationId ===
+  (selectedConversationId || conversations[0]?.conversationId) ===
   conversation.conversationId;
 
                   const latestChat =

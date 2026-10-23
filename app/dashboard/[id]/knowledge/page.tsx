@@ -78,10 +78,9 @@ export default function KnowledgePage() {
       setFiles(
         data.files || []
       );
-    } catch (error: any) {
+    } catch (error) {
       setError(
-        error?.message ||
-          "Failed to load knowledge files."
+        error instanceof Error ? error.message : "Failed to load knowledge files."
       );
     } finally {
       setLoading(false);
@@ -89,9 +88,11 @@ export default function KnowledgePage() {
   }
 
   useEffect(() => {
-    if (websiteId) {
-      loadFiles();
-    }
+    if (!websiteId) return;
+    const timeout = window.setTimeout(() => {
+      void loadFiles();
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [websiteId]);
 
   // ==========================================
@@ -150,10 +151,9 @@ export default function KnowledgePage() {
       );
 
       await loadFiles();
-    } catch (error: any) {
+    } catch (error) {
       setError(
-        error?.message ||
-          "Upload failed."
+        error instanceof Error ? error.message : "Upload failed."
       );
     } finally {
       setUploading(false);
@@ -220,10 +220,9 @@ export default function KnowledgePage() {
       );
 
       await loadFiles();
-    } catch (error: any) {
+    } catch (error) {
       setError(
-        error?.message ||
-          "Delete failed."
+        error instanceof Error ? error.message : "Delete failed."
       );
     } finally {
       setDeletingFile(null);

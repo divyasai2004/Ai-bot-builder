@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "./supabaseAdmin";
+import type { ParsedAnalysis } from "./analysisParser";
 
 export async function getWebsite(
   url: string,
@@ -42,7 +43,7 @@ interface SaveWebsiteData {
 
   website_content: string;
 
-  analysis_json: any;
+  analysis_json: ParsedAnalysis | null;
 
   products: string[];
 }

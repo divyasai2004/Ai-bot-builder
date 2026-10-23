@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import ChatWidget from "@/components/ChatWidget";
 import { useRouter } from "next/navigation";
 import { supabaseClient } from "@/lib/supabaseClient";
+import type { User } from "@supabase/supabase-js";
 import {
   Bot,
   ArrowRight,
@@ -66,11 +67,14 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [result, setResult] = useState("");
   const [widgetCode, setWidgetCode] = useState("");
-  const [websiteContent, setWebsiteContent] = useState("");
-  const [botConfig, setBotConfig] = useState<any>(null);
+  const [botConfig, setBotConfig] = useState<{
+    botName: string;
+    welcomeMessage: string;
+    suggestedQuestions?: string[];
+  } | null>(null);
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const [messages, setMessages] = useState<
     { sender: string; text: string }[]
@@ -173,7 +177,6 @@ export default function Home() {
       setResult(data.analysis || "");
       setBotConfig(data.botConfig);
       setWidgetCode(data.widgetCode || "");
-      setWebsiteContent(data.websiteContent || "");
       setProducts(data.products || []);
       setWebsiteId(data.websiteId);
 
@@ -297,7 +300,7 @@ export default function Home() {
           content: answer,
         },
       ]);
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
 
       setMessages((prev) => {
@@ -305,7 +308,7 @@ export default function Home() {
 
         updated[updated.length - 1] = {
           sender: "bot",
-          text: error?.message || "Sorry, I couldn't process your request.",
+          text: error instanceof Error ? error.message : "Sorry, I couldn't process your request.",
         };
 
         return updated;

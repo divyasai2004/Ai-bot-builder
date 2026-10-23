@@ -188,7 +188,7 @@ export async function GET(
       success: true,
       files,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error(
       "KNOWLEDGE LIST ERROR:",
       error
@@ -198,9 +198,7 @@ export async function GET(
       {
         success: false,
 
-        error:
-          error?.message ||
-          "Failed to load knowledge files.",
+        error: error instanceof Error ? error.message : "Failed to load knowledge files.",
       },
       {
         status: 500,

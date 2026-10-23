@@ -171,7 +171,7 @@ export async function DELETE(
       message:
         `${fileName} deleted successfully.`,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error(
       "KNOWLEDGE DELETE ERROR:",
       error
@@ -181,9 +181,7 @@ export async function DELETE(
       {
         success: false,
 
-        error:
-          error?.message ||
-          "Delete failed.",
+        error: error instanceof Error ? error.message : "Delete failed.",
       },
       {
         status: 500,

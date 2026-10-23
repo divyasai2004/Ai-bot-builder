@@ -259,7 +259,7 @@ export async function DELETE(
       success: true,
       message: "Bot deleted successfully.",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error(
       "DELETE BOT ERROR:",
       error
@@ -268,12 +268,9 @@ export async function DELETE(
     return NextResponse.json(
       {
         success: false,
-        error:
-          error?.message ||
-          "Failed to delete bot.",
+        error: error instanceof Error ? error.message : "Failed to delete bot.",
       },
       { status: 500 }
     );
   }
 }
-  

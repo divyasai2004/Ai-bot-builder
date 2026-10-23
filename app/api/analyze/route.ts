@@ -683,7 +683,7 @@ export async function POST(req: Request) {
     });
 
 
-  } catch (error: any) {
+  } catch (error) {
 
     console.error(
       "========== ANALYZE ERROR =========="
@@ -700,9 +700,7 @@ export async function POST(req: Request) {
 
         success: false,
 
-        error:
-          error?.message ||
-          "Website analysis failed.",
+        error: error instanceof Error ? error.message : "Website analysis failed.",
 
       },
       {

@@ -168,14 +168,14 @@ export default function PlaygroundPage() {
           return updated;
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Playground chat error:", error);
       setMessages((prev) => {
         const updated = [...prev];
         const lastMsg = updated[updated.length - 1];
         if (lastMsg && lastMsg.role === "assistant" && !lastMsg.content) {
           lastMsg.content =
-            error?.message || "Sorry, an error occurred while processing your request.";
+            error instanceof Error ? error.message : "Sorry, an error occurred while processing your request.";
           return updated;
         }
         return [
@@ -183,7 +183,7 @@ export default function PlaygroundPage() {
           {
             role: "assistant",
             content:
-              error?.message || "Sorry, an error occurred while processing your request.",
+              error instanceof Error ? error.message : "Sorry, an error occurred while processing your request.",
           },
         ];
       });

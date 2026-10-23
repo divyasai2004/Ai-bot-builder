@@ -33,7 +33,7 @@ async function extractPdfText(
 
     text +=
       content.items
-        .map((item: any) => item.str)
+        .map((item) => ("str" in item && typeof item.str === "string" ? item.str : ""))
         .join(" ") + "\n";
   }
 
@@ -312,7 +312,7 @@ else {
       message:
         "Knowledge document uploaded successfully.",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error(
       "KNOWLEDGE UPLOAD ERROR:",
       error
@@ -322,9 +322,7 @@ else {
       {
         success: false,
 
-        error:
-          error?.message ||
-          "Upload failed.",
+        error: error instanceof Error ? error.message : "Upload failed.",
       },
       {
         status: 500,
